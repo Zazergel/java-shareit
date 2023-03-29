@@ -1,20 +1,20 @@
-package ru.practicum.shareit.booking.model;
+package ru.practicum.shareit.booking;
 
 import lombok.Builder;
-import lombok.Data;
-import ru.practicum.shareit.item.model.Item;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @Builder
-public class Booking {
+public class BookingDto {
 
     private Long id;
     private LocalDateTime start;
     private LocalDateTime end;
-    private Item item;
-    private Long broker;
+    private Long itemId;
+    private Long bookerId;
     private BookingStatus status;
-
 }

@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user.storage;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exceptions.EmailException;
 import ru.practicum.shareit.exceptions.NotFoundException;
@@ -8,6 +9,7 @@ import ru.practicum.shareit.user.User;
 import java.util.*;
 
 @Repository
+@RequiredArgsConstructor
 public class UserStorageInMemory implements UserStorage {
 
     private final Map<Long, User> userStorage = new HashMap<>();

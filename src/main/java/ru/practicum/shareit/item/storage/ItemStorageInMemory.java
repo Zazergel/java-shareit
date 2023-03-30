@@ -19,7 +19,6 @@ public class ItemStorageInMemory implements ItemStorage {
 
     @Override
     public Item addItem(Item item) {
-        userService.get(item.getOwnerId());
         item.setId(idCount++);
         items.put(item.getId(), item);
         return item;

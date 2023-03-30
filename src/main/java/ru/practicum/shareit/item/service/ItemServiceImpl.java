@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.storage.ItemStorage;
+import ru.practicum.shareit.user.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,10 +17,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ItemServiceImpl implements ItemService {
     private final ItemStorage itemStorage;
-    private final ItemMapper itemMapper;
+    private final UserService userService;
 
     @Override
     public ItemDto add(Long userId, ItemDto itemDto) {
+        userService.get(userId);
         log.info("Создание вещи {} пользователем с id {}.", itemDto, userId);
         itemDto.setOwnerId(userId);
         return ItemMapper.toItemDto(itemStorage.addItem(ItemMapper.toItem(itemDto)));

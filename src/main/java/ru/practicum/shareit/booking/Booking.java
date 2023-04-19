@@ -1,21 +1,59 @@
 package ru.practicum.shareit.booking;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import ru.practicum.shareit.booking.enums.Status;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.User;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "BOOKINGS", schema = "public")
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @Getter
 @Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class Booking {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
 
-    private Long id;
-    private LocalDateTime start;
-    private LocalDateTime end;
-    private Long itemId;
-    private Long bookerId;
-    private BookingStatus status;
+    @Column(name = "START_DATE", nullable = false)
+    LocalDateTime start;
 
+    @Column(name = "END_DATE", nullable = false)
+    LocalDateTime end;
+
+    @OneToOne
+    @JoinColumn(name = "ITEM_ID", referencedColumnName = "ID", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    Item item;
+
+    @OneToOne
+    @JoinColumn(name = "BOOKER_ID", referencedColumnName = "ID", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    User booker;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "STATUS", nullable = false)
+    Status status;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Booking)) return false;
+        return id != null && id.equals(((Booking) o).getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

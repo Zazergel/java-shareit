@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
-public class Booking {
+public class BookingDto {
 
     private Long id;
     private LocalDateTime start;
@@ -17,5 +17,4 @@ public class Booking {
     private Long itemId;
     private Long bookerId;
     private BookingStatus status;
-
 }

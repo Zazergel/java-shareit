@@ -10,6 +10,7 @@ import ru.practicum.shareit.item.dto.ItemExtendedDto;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.markers.Create;
 import ru.practicum.shareit.markers.Update;
+import ru.practicum.shareit.user.UserController;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -18,28 +19,27 @@ import java.util.List;
 @RequestMapping("/items")
 @RequiredArgsConstructor
 public class ItemController {
-    public final ItemService itemService;
-    private final String headerUserId = "X-Sharer-User-Id";
+    private final ItemService itemService;
 
     @GetMapping
-    public List<ItemExtendedDto> getByOwnerId(@RequestHeader(headerUserId) Long userId) {
+    public List<ItemExtendedDto> getByOwnerId(@RequestHeader(UserController.headerUserId) Long userId) {
         return itemService.getByOwnerId(userId);
     }
 
     @GetMapping("/{id}")
-    public ItemExtendedDto getById(@RequestHeader(headerUserId) Long userId,
+    public ItemExtendedDto getById(@RequestHeader(UserController.headerUserId) Long userId,
                                    @PathVariable Long id) {
         return itemService.getById(userId, id);
     }
 
     @PostMapping
-    public ItemDto add(@RequestHeader(headerUserId) Long userId,
+    public ItemDto add(@RequestHeader(UserController.headerUserId) Long userId,
                        @Validated(Create.class) @RequestBody ItemDto itemDto) {
         return itemService.add(userId, itemDto);
     }
 
     @PatchMapping("/{id}")
-    public ItemDto update(@RequestHeader(headerUserId) Long userId,
+    public ItemDto update(@RequestHeader(UserController.headerUserId) Long userId,
                           @PathVariable Long id,
                           @Validated(Update.class) @RequestBody ItemDto itemDto) {
         return itemService.update(userId, id, itemDto);
@@ -56,7 +56,7 @@ public class ItemController {
     }
 
     @PostMapping("{id}/comment")
-    public CommentDto addComment(@RequestHeader(headerUserId) long userId,
+    public CommentDto addComment(@RequestHeader(UserController.headerUserId) long userId,
                                  @PathVariable long id,
                                  @Valid @RequestBody CommentRequestDto commentRequestDto) {
         return itemService.addComment(userId, id, commentRequestDto);

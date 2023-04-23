@@ -7,6 +7,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "ITEMS", schema = "public")
@@ -31,7 +32,7 @@ public class Item {
     @Column(nullable = false)
     Boolean available;
 
-    @OneToOne
+    @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "OWNER_ID", referencedColumnName = "ID", nullable = false)
     User owner;
@@ -48,6 +49,6 @@ public class Item {
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return Objects.hash(id, name, description, available, owner, requestId);
     }
 }

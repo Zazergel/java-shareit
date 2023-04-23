@@ -2,9 +2,9 @@ package ru.practicum.shareit.booking.dto;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import ru.practicum.shareit.booking.enums.Status;
 
 import javax.validation.constraints.Future;
+import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
@@ -14,10 +14,9 @@ import java.time.LocalDateTime;
 @Builder
 @ToString
 public class BookingRequestDto {
-    Long id;
 
     @NotNull
-    @Future
+    @FutureOrPresent
     LocalDateTime start;
 
     @NotNull
@@ -27,6 +26,4 @@ public class BookingRequestDto {
     @NotNull
     Long itemId;
 
-    Long bookerId;
-    Status status;
 }

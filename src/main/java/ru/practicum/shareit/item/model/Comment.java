@@ -8,6 +8,7 @@ import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "COMMENTS", schema = "public")
@@ -29,13 +30,25 @@ public class Comment {
     @Column(name = "CREATED_DATE", nullable = false)
     LocalDateTime created;
 
-    @OneToOne
+    @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "AUTHOR_ID", referencedColumnName = "ID", nullable = false)
     User author;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "ITEM_ID", referencedColumnName = "ID", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     Item item;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Comment)) return false;
+        return id != null && id.equals(((Comment) o).getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, text, created, author, item);
+    }
 }

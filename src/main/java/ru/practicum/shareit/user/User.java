@@ -5,6 +5,7 @@ import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
+import java.util.Objects;
 
 @Entity
 @Table(name = "USERS", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = {"email"}))
@@ -36,6 +37,6 @@ public class User {
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return Objects.hash(id, name, email);
     }
 }

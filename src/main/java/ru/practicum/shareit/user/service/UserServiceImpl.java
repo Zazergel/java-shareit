@@ -70,4 +70,10 @@ public class UserServiceImpl implements UserService {
         log.info("Удаление пользователя с id {}", id);
         userRepository.deleteById(id);
     }
+
+    @Override
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Пользователя с таким id не существует."));
+    }
 }

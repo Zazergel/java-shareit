@@ -10,6 +10,7 @@ import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "BOOKINGS", schema = "public")
@@ -31,12 +32,12 @@ public class Booking {
     @Column(name = "END_DATE", nullable = false)
     LocalDateTime end;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "ITEM_ID", referencedColumnName = "ID", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     Item item;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "BOOKER_ID", referencedColumnName = "ID", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     User booker;
@@ -54,6 +55,6 @@ public class Booking {
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return Objects.hash(id, start, end, item, booker, status);
     }
 }

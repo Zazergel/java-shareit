@@ -139,15 +139,26 @@ public class BookingServiceImpl implements BookingService {
         if (!item.getAvailable()) {
             throw new BookingException("Предмет недоступен для бронирования.");
         }
-        if (!bookingRepository
-                .findByItemIdAndStartBeforeAndEndAfterAndStatusEqualsOrderByStartAsc(
-                        item.getId(),
-                        bookingRequestDto.getStart(),
-                        bookingRequestDto.getEnd(),
-                        Status.APPROVED)
-                .isEmpty()) {
-            throw new BookingException("Предмет недоступен для бронирования. Его сейчас кто-то использует!");
+        if (!bookingRepository.findByItemIdAndStartBeforeAndEndAfterAndStatusEqualsOrderByStartAsc(item.getId(),
+                bookingRequestDto.getStart(),
+                bookingRequestDto.getEnd(), Status.APPROVED).isEmpty()
+                || !bookingRepository.findByItemIdAndStartAfterAndEndBeforeAndStatusEqualsOrderByStartAsc(item.getId(),
+                bookingRequestDto.getStart(),
+                bookingRequestDto.getEnd(), Status.APPROVED).isEmpty()
+                || !bookingRepository.findByItemId(item.getId())
+                .stream().filter(booking -> booking.getStart().isBefore(bookingRequestDto.getStart()) &&
+                        booking.getEnd().isBefore(bookingRequestDto.getEnd()) &&
+                        booking.getEnd().isAfter(bookingRequestDto.getStart()))
+                .collect(Collectors.toList()).isEmpty() || !bookingRepository.findByItemId(item.getId())
+                .stream()
+                .filter(booking -> booking.getStart().isAfter(bookingRequestDto.getStart()) &&
+                        booking.getStart().isBefore(bookingRequestDto.getEnd()) &&
+                        booking.getEnd().isAfter(bookingRequestDto.getEnd())).
+                collect(Collectors.toList()).isEmpty()) {
+
+            throw new BookingException("Предмет недоступен для бронирования. В это время его еще кто-то использует!");
         }
+
         User user = userService.getUserById(userId);
 
         if (userId.equals(item.getOwner().getId())) {

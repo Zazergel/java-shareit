@@ -23,9 +23,7 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,10 +41,71 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemExtendedDto> getByOwnerId(Long userId) {
         log.info("Вывод всех вещей пользователя с id {}.", userId);
 
-        return itemRepository.getAllByOwnerIdOrderByIdAsc(userId).stream()
-                .map((item) -> itemMapper.toItemExtendedDto(item, addLastBooking(item),
-                        addNextBooking(item), addComment(item)))
+        List<Item> items = itemRepository.getAllByOwnerIdOrderByIdAsc(userId);
+
+        List<Long> itemIds = items.stream()
+                .map(Item::getId)
                 .collect(Collectors.toList());
+
+        Map<Item, List<Comment>> commentsByItem = commentRepository.findByItemIdIn(itemIds)
+                .stream()
+                .collect(Collectors.groupingBy(Comment::getItem));
+        Map<Item, List<Booking>> bookingsByItem = bookingRepository.findByItemIdIn(itemIds)
+                .stream()
+                .collect(Collectors.groupingBy(Booking::getItem));
+
+        Map<Long, List<CommentDto>> commentDtosByItem = new HashMap<>();
+        for (Item item : items) {
+            if (commentsByItem.get(item) == null) {
+                commentDtosByItem.put(item.getId(), new ArrayList<>());
+            } else {
+                commentDtosByItem.put(item.getId(), commentsByItem.get(item)
+                        .stream()
+                        .map(itemMapper::commentToCommentDto)
+                        .collect(Collectors.toList()));
+            }
+        }
+
+        Map<Long, List<BookingItemDto>> bookingDtosByItem = new HashMap<>();
+
+        for (Item item : items) {
+            if (bookingsByItem.get(item) != null) {
+                bookingDtosByItem.put(item.getId(), bookingsByItem.get(item)
+                        .stream()
+                        .filter(Booking -> Booking.getStatus().equals(Status.APPROVED))
+                        .map(itemMapper::bookingToBookingItemDto)
+                        .sorted(Comparator.comparing(BookingItemDto::getStart))
+                        .collect(Collectors.toList()));
+            }
+        }
+        Map<Long, BookingItemDto> lastBookingByItem = new HashMap<>();
+        Map<Long, BookingItemDto> nextBookingByItem = new HashMap<>();
+
+        for (Item item : items) {
+            if (bookingsByItem.get(item) == null) {
+                lastBookingByItem.put(item.getId(), null);
+                nextBookingByItem.put(item.getId(), null);
+            } else {
+                nextBookingByItem.put(item.getId(), bookingDtosByItem.get(item.getId())
+                        .stream()
+                        .filter(b -> b.getStart().isBefore(LocalDateTime.now()))
+                        .findFirst().orElse(null));
+
+                lastBookingByItem.put(item.getId(), bookingDtosByItem.get(item.getId())
+                        .stream()
+                        .filter(b -> b.getStart().isAfter(LocalDateTime.now()))
+                        .findFirst().orElse(null));
+            }
+        }
+
+        List<ItemExtendedDto> itemExtendedDtos = items.stream()
+                .map(item -> itemMapper.toItemExtendedDto(item, null, null, null))
+                .collect(Collectors.toList());
+
+        itemExtendedDtos.forEach(ItemDto -> ItemDto.setComments(commentDtosByItem.get(ItemDto.getId())));
+        itemExtendedDtos.forEach(ItemDto -> ItemDto.setNextBooking(lastBookingByItem.get(ItemDto.getId())));
+        itemExtendedDtos.forEach(ItemDto -> ItemDto.setLastBooking(nextBookingByItem.get(ItemDto.getId())));
+        return itemExtendedDtos;
     }
 
     @Override

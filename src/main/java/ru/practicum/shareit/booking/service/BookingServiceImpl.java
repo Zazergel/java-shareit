@@ -153,8 +153,8 @@ public class BookingServiceImpl implements BookingService {
                 .stream()
                 .filter(booking -> booking.getStart().isAfter(bookingRequestDto.getStart()) &&
                         booking.getStart().isBefore(bookingRequestDto.getEnd()) &&
-                        booking.getEnd().isAfter(bookingRequestDto.getEnd())).
-                collect(Collectors.toList()).isEmpty()) {
+                        booking.getEnd().isAfter(bookingRequestDto.getEnd()))
+                .collect(Collectors.toList()).isEmpty()) {
 
             throw new BookingException("Предмет недоступен для бронирования. В это время его еще кто-то использует!");
         }

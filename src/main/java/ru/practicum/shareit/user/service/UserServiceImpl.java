@@ -3,49 +3,77 @@ package ru.practicum.shareit.user.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.dto.UserMapper;
-import ru.practicum.shareit.user.storage.UserStorage;
+import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.exceptions.NotFoundException;
+import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.UserDto;
+import ru.practicum.shareit.user.UserMapper;
+import ru.practicum.shareit.user.UserRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final UserStorage userStorage;
-
-    @Override
-    public UserDto add(UserDto userDto) {
-        log.info("Добавление пользователя {}", userDto);
-        return UserMapper.toUserDto(userStorage.add(UserMapper.toUser(userDto)));
-    }
-
-    @Override
-    public UserDto get(Long userId) {
-        log.info("Вывод пользователя с id {}.", userId);
-        return UserMapper.toUserDto(userStorage.getUserById(userId));
-    }
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @Override
     public List<UserDto> getAll() {
         log.info("Вывод всех пользователей.");
-        return userStorage.getAll().stream()
-                .map(UserMapper::toUserDto)
+        return userRepository.findAll().stream()
+                .map(userMapper::toUserDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public UserDto update(Long userId, UserDto userDto) {
-        log.info("Обновление пользователя {} с id {}.", userDto, userId);
-        userDto.setId(userId);
-        return UserMapper.toUserDto(userStorage.update(UserMapper.toUser(userDto)));
+    public UserDto getById(Long id) {
+        log.info("Вывод пользователя с id {}.", id);
+        return userMapper.toUserDto(userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Пользователя с таким id не существует.")));
     }
 
     @Override
-    public Boolean delete(Long userId) {
-        log.info("Удаление пользователя с id {}", userId);
-        return userStorage.delete(userId);
+    @Transactional
+    public UserDto add(UserDto userDto) {
+        log.info("Добавление пользователя {}", userDto);
+        return userMapper.toUserDto(userRepository.save(userMapper.toUser(userDto)));
+    }
+
+    @Override
+    @Transactional
+    public UserDto update(Long id, UserDto userDto) {
+        log.info("Обновление пользователя {} с id {}.", userDto, id);
+
+        User repoUser = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Пользователя с таким id не существует."));
+
+        userDto.setId(id);
+        User user = userMapper.toUser(userDto);
+
+        if (user.getEmail() != null) {
+            repoUser.setEmail(user.getEmail());
+        }
+        if (user.getName() != null) {
+            repoUser.setName(user.getName());
+        }
+
+        return userMapper.toUserDto(userRepository.save(repoUser));
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id) {
+        log.info("Удаление пользователя с id {}", id);
+        userRepository.deleteById(id);
+    }
+
+    @Override
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Пользователя с таким id не существует."));
     }
 }

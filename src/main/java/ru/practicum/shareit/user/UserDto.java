@@ -1,15 +1,14 @@
-package ru.practicum.shareit.user.dto;
+package ru.practicum.shareit.user;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import ru.practicum.shareit.marks.Create;
-import ru.practicum.shareit.marks.Update;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+import ru.practicum.shareit.markers.Create;
+import ru.practicum.shareit.markers.Update;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @Getter
 @Setter
 @Builder

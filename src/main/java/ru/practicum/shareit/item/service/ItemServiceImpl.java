@@ -2,6 +2,8 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.Booking;
@@ -38,28 +40,28 @@ public class ItemServiceImpl implements ItemService {
     private final ItemMapper itemMapper;
 
     @Override
-    public List<ItemExtendedDto> getByOwnerId(Long userId) {
+    public List<ItemExtendedDto> getByOwnerId(Long userId, Pageable pageable) {
         log.info("Вывод всех вещей пользователя с id {}.", userId);
 
-        List<Item> items = itemRepository.getAllByOwnerIdOrderByIdAsc(userId);
+        Page<Item> items = itemRepository.findByOwnerIdOrderByIdAsc(userId, pageable);
 
         List<Long> itemIds = items.stream()
                 .map(Item::getId)
                 .collect(Collectors.toList());
 
-        Map<Item, List<Comment>> commentsByItem = commentRepository.findByItemIdIn(itemIds)
+        Map<Long, List<Comment>> commentsByItem = commentRepository.findByItemIdIn(itemIds)
                 .stream()
-                .collect(Collectors.groupingBy(Comment::getItem));
+                .collect(Collectors.groupingBy(Comment::getItemId));
         Map<Item, List<Booking>> bookingsByItem = bookingRepository.findByItemIdIn(itemIds)
                 .stream()
                 .collect(Collectors.groupingBy(Booking::getItem));
 
         Map<Long, List<CommentDto>> commentDtosByItem = new HashMap<>();
         for (Item item : items) {
-            if (commentsByItem.get(item) == null) {
+            if (commentsByItem.get(item.getId()) == null) {
                 commentDtosByItem.put(item.getId(), new ArrayList<>());
             } else {
-                commentDtosByItem.put(item.getId(), commentsByItem.get(item)
+                commentDtosByItem.put(item.getId(), commentsByItem.get(item.getId())
                         .stream()
                         .map(itemMapper::commentToCommentDto)
                         .collect(Collectors.toList()));
@@ -85,26 +87,29 @@ public class ItemServiceImpl implements ItemService {
             if (bookingsByItem.get(item) == null) {
                 lastBookingByItem.put(item.getId(), null);
                 nextBookingByItem.put(item.getId(), null);
-            } else {
-                nextBookingByItem.put(item.getId(), bookingDtosByItem.get(item.getId())
-                        .stream()
-                        .filter(b -> b.getStart().isBefore(LocalDateTime.now()))
-                        .findFirst().orElse(null));
-
+            }
+            if (bookingsByItem.get(item) != null) {
                 lastBookingByItem.put(item.getId(), bookingDtosByItem.get(item.getId())
                         .stream()
+                        .filter(b -> b.getStart().isBefore(LocalDateTime.now()))
+                        .min(Comparator.comparing(BookingItemDto::getStart))
+                        .orElse(null));
+
+                nextBookingByItem.put(item.getId(), bookingDtosByItem.get(item.getId())
+                        .stream()
                         .filter(b -> b.getStart().isAfter(LocalDateTime.now()))
-                        .findFirst().orElse(null));
+                        .min(Comparator.comparing(BookingItemDto::getStart))
+                        .orElse(null));
             }
         }
 
         List<ItemExtendedDto> itemExtendedDtos = items.stream()
-                .map(item -> itemMapper.toItemExtendedDto(item, null, null, null))
+                .map(item -> itemMapper.toItemExtendedDto(item, null, null))
                 .collect(Collectors.toList());
 
         itemExtendedDtos.forEach(ItemDto -> ItemDto.setComments(commentDtosByItem.get(ItemDto.getId())));
-        itemExtendedDtos.forEach(ItemDto -> ItemDto.setNextBooking(lastBookingByItem.get(ItemDto.getId())));
-        itemExtendedDtos.forEach(ItemDto -> ItemDto.setLastBooking(nextBookingByItem.get(ItemDto.getId())));
+        itemExtendedDtos.forEach(ItemDto -> ItemDto.setNextBooking(nextBookingByItem.get(ItemDto.getId())));
+        itemExtendedDtos.forEach(ItemDto -> ItemDto.setLastBooking(lastBookingByItem.get(ItemDto.getId())));
         return itemExtendedDtos;
     }
 
@@ -114,10 +119,9 @@ public class ItemServiceImpl implements ItemService {
 
         Item item = getItemById(id);
         if (!Objects.equals(userId, item.getOwner().getId())) {
-            return itemMapper.toItemExtendedDto(item, null, null, addComment(item));
+            return itemMapper.toItemExtendedDto(item, null, null);
         } else {
-            return itemMapper.toItemExtendedDto(item, addLastBooking(item),
-                    addNextBooking(item), addComment(item));
+            return itemMapper.toItemExtendedDto(item, addLastBooking(item), addNextBooking(item));
         }
     }
 
@@ -162,14 +166,14 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> search(String text) {
+    public List<ItemDto> search(String text, Pageable pageable) {
         log.info("Поиск вещей с подстрокой \"{}\".", text);
 
-        if (text.isBlank() || text.isEmpty()) {
+        if (text.isBlank() || text.isEmpty() || text.equals(" ")) {
             return new ArrayList<>();
         }
 
-        return itemRepository.search(text)
+        return itemRepository.search(text, pageable)
                 .stream()
                 .map(itemMapper::toItemDto)
                 .collect(Collectors.toList());
@@ -183,12 +187,13 @@ public class ItemServiceImpl implements ItemService {
         Comment comment = itemMapper.commentRequestDtoToComment(commentRequestDto,
                 LocalDateTime.now(),
                 userService.getUserById(userId),
-                getItemById(id));
+                id);
 
         if (bookingRepository.findByItemIdAndBookerIdAndEndIsBeforeAndStatusEquals(
                 id, userId, LocalDateTime.now(), Status.APPROVED).isEmpty()) {
             throw new BookingException("Пользователь не брал данную вещь в аренду.");
         }
+
         return itemMapper.commentToCommentDto(commentRepository.save(comment));
     }
 

@@ -35,10 +35,8 @@ public class Comment {
     @JoinColumn(name = "AUTHOR_ID", referencedColumnName = "ID", nullable = false)
     User author;
 
-    @ManyToOne
-    @JoinColumn(name = "ITEM_ID", referencedColumnName = "ID", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    Item item;
+    @Column(name = "ITEM_ID")
+    Long itemId;
 
     @Override
     public boolean equals(Object o) {
@@ -49,6 +47,6 @@ public class Comment {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, text, created, author, item);
+        return Objects.hash(id, text, created, author, itemId);
     }
 }

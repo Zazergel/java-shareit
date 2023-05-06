@@ -23,18 +23,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private UserMapperImpl userMapper;
-
-    @InjectMocks
-    private UserServiceImpl userService;
-
-    @Captor
-    private ArgumentCaptor<User> userArgumentCaptor;
-
     private final User user1 = User.builder()
             .id(1L)
             .name("Test user 1")
@@ -45,6 +33,14 @@ class UserServiceImplTest {
             .name("Test user 2")
             .email("tester2@yandex.ru")
             .build();
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private UserMapperImpl userMapper;
+    @InjectMocks
+    private UserServiceImpl userService;
+    @Captor
+    private ArgumentCaptor<User> userArgumentCaptor;
     private UserDto updateUserDto;
 
     @BeforeEach
@@ -54,6 +50,12 @@ class UserServiceImplTest {
                 .name("Update test user 1")
                 .email("tester2@yandex.ru")
                 .build();
+    }
+
+    private void checkUserDto(User user, UserDto userDtoFromService) {
+        assertEquals(user.getId(), userDtoFromService.getId());
+        assertEquals(user.getName(), userDtoFromService.getName());
+        assertEquals(user.getEmail(), userDtoFromService.getEmail());
     }
 
     @Nested
@@ -202,11 +204,5 @@ class UserServiceImplTest {
             assertEquals("Пользователя с таким id не существует.", exception.getMessage());
             verify(userRepository, times(1)).findById(any());
         }
-    }
-
-    private void checkUserDto(User user, UserDto userDtoFromService) {
-        assertEquals(user.getId(), userDtoFromService.getId());
-        assertEquals(user.getName(), userDtoFromService.getName());
-        assertEquals(user.getEmail(), userDtoFromService.getEmail());
     }
 }

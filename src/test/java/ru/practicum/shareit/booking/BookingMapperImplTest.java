@@ -24,15 +24,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class BookingMapperImplTest {
-    @Mock
-    private UserMapperImpl userMapper;
-
-    @Mock
-    private ItemMapperImpl itemMapper;
-
-    @InjectMocks
-    private BookingMapperImpl bookingMapper;
-
     private final LocalDateTime dateTime = LocalDateTime.of(2023, 1, 1, 10, 0, 0);
     private final Status status = Status.WAITING;
     private final User user = User.builder()
@@ -60,6 +51,12 @@ public class BookingMapperImplTest {
             .booker(user)
             .status(Status.APPROVED)
             .build();
+    @Mock
+    private UserMapperImpl userMapper;
+    @Mock
+    private ItemMapperImpl itemMapper;
+    @InjectMocks
+    private BookingMapperImpl bookingMapper;
 
     @Nested
     class RequestDtoToBooking {

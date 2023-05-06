@@ -104,7 +104,7 @@ public class ItemServiceImpl implements ItemService {
         }
 
         List<ItemExtendedDto> itemExtendedDtos = items.stream()
-                .map(item -> itemMapper.toItemExtendedDto(item, null, null))
+                .map(item -> itemMapper.toItemExtendedDto(item, null, null, null))
                 .collect(Collectors.toList());
 
         itemExtendedDtos.forEach(ItemDto -> ItemDto.setComments(commentDtosByItem.get(ItemDto.getId())));
@@ -119,9 +119,14 @@ public class ItemServiceImpl implements ItemService {
 
         Item item = getItemById(id);
         if (!Objects.equals(userId, item.getOwner().getId())) {
-            return itemMapper.toItemExtendedDto(item, null, null);
+            return itemMapper.toItemExtendedDto(item, null, null, addComments(item));
         } else {
-            return itemMapper.toItemExtendedDto(item, addLastBooking(item), addNextBooking(item));
+            List<CommentDto> comments = addComments(item);
+
+            return itemMapper
+                    .toItemExtendedDto(item, addLastBooking(item),
+                            addNextBooking(item),
+                            Objects.requireNonNullElseGet(comments, ArrayList::new));
         }
     }
 
@@ -227,7 +232,7 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
-    private List<CommentDto> addComment(Item item) {
+    private List<CommentDto> addComments(Item item) {
         return commentRepository.findByItemId(item.getId()).stream()
                 .map(itemMapper::commentToCommentDto)
                 .collect(Collectors.toList());

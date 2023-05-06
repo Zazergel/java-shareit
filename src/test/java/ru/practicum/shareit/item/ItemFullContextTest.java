@@ -19,6 +19,7 @@ import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.CommentRequestDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemExtendedDto;
+import ru.practicum.shareit.markers.Constants;
 import ru.practicum.shareit.user.UserController;
 import ru.practicum.shareit.user.UserDto;
 
@@ -35,6 +36,38 @@ public class ItemFullContextTest {
     private final ItemController itemController;
     private final BookingController bookingController;
     private final BookingService bookingService;
+
+    private void checkItemExtendedDto(ItemExtendedDto itemFromController, ItemDto itemDto) {
+        assertEquals(itemFromController.getId(), itemDto.getId());
+        assertEquals(itemFromController.getName(), itemDto.getName());
+        assertEquals(itemFromController.getDescription(), itemDto.getDescription());
+        assertEquals(itemFromController.getAvailable(), itemDto.getAvailable());
+        assertEquals(itemFromController.getOwnerId(), itemDto.getOwnerId());
+        assertEquals(itemFromController.getRequestId(), itemDto.getRequestId());
+    }
+
+    private void checkItemExtendedDtoBooking(ItemExtendedDto itemFromController,
+                                             BookingResponseDto lastBookingResponseDto,
+                                             BookingResponseDto nextBookingResponseDto) {
+        assertEquals(itemFromController.getLastBooking().getId(), lastBookingResponseDto.getId());
+        assertEquals(itemFromController.getLastBooking().getBookerId(), lastBookingResponseDto.getBooker().getId());
+        assertEquals(itemFromController.getLastBooking().getStart(), lastBookingResponseDto.getStart());
+        assertEquals(itemFromController.getLastBooking().getEnd(), lastBookingResponseDto.getEnd());
+
+        assertEquals(itemFromController.getNextBooking().getId(), nextBookingResponseDto.getId());
+        assertEquals(itemFromController.getNextBooking().getBookerId(), nextBookingResponseDto.getBooker().getId());
+        assertEquals(itemFromController.getNextBooking().getStart(), nextBookingResponseDto.getStart());
+        assertEquals(itemFromController.getNextBooking().getEnd(), nextBookingResponseDto.getEnd());
+    }
+
+    private void checkItemDto(ItemDto itemDtoFromController, ItemDto itemDto) {
+        assertEquals(itemDtoFromController.getId(), itemDto.getId());
+        assertEquals(itemDtoFromController.getName(), itemDto.getName());
+        assertEquals(itemDtoFromController.getDescription(), itemDto.getDescription());
+        assertEquals(itemDtoFromController.getAvailable(), itemDto.getAvailable());
+        assertEquals(itemDtoFromController.getOwnerId(), itemDto.getOwnerId());
+        assertEquals(itemDtoFromController.getRequestId(), itemDto.getRequestId());
+    }
 
     @Nested
     class Add {
@@ -59,8 +92,8 @@ public class ItemFullContextTest {
 
             List<ItemExtendedDto> itemsFromController = itemController.getByOwnerId(
                     userDto.getId(),
-                    Integer.parseInt(UserController.PAGE_DEFAULT_FROM),
-                    Integer.parseInt(UserController.PAGE_DEFAULT_SIZE));
+                    Integer.parseInt(Constants.PAGE_DEFAULT_FROM),
+                    Integer.parseInt(Constants.PAGE_DEFAULT_SIZE));
 
             assertEquals(itemsFromController.size(), 1);
 
@@ -134,8 +167,8 @@ public class ItemFullContextTest {
 
             List<ItemExtendedDto> itemsFromController1 = itemController.getByOwnerId(
                     userDto1.getId(),
-                    Integer.parseInt(UserController.PAGE_DEFAULT_FROM),
-                    Integer.parseInt(UserController.PAGE_DEFAULT_SIZE));
+                    Integer.parseInt(Constants.PAGE_DEFAULT_FROM),
+                    Integer.parseInt(Constants.PAGE_DEFAULT_SIZE));
 
             assertEquals(itemsFromController1.size(), 2);
 
@@ -147,8 +180,8 @@ public class ItemFullContextTest {
 
             List<ItemExtendedDto> itemsFromController2 = itemController.getByOwnerId(
                     userDto2.getId(),
-                    Integer.parseInt(UserController.PAGE_DEFAULT_FROM),
-                    Integer.parseInt(UserController.PAGE_DEFAULT_SIZE));
+                    Integer.parseInt(Constants.PAGE_DEFAULT_FROM),
+                    Integer.parseInt(Constants.PAGE_DEFAULT_SIZE));
 
             assertEquals(itemsFromController2.size(), 1);
 
@@ -168,8 +201,8 @@ public class ItemFullContextTest {
 
             List<ItemExtendedDto> itemsFromController = itemController.getByOwnerId(
                     userDto.getId(),
-                    Integer.parseInt(UserController.PAGE_DEFAULT_FROM),
-                    Integer.parseInt(UserController.PAGE_DEFAULT_SIZE));
+                    Integer.parseInt(Constants.PAGE_DEFAULT_FROM),
+                    Integer.parseInt(Constants.PAGE_DEFAULT_SIZE));
 
             assertTrue(itemsFromController.isEmpty());
         }
@@ -231,8 +264,8 @@ public class ItemFullContextTest {
 
             List<ItemExtendedDto> itemsFromController = itemController.getByOwnerId(
                     userDto1.getId(),
-                    Integer.parseInt(UserController.PAGE_DEFAULT_FROM),
-                    Integer.parseInt(UserController.PAGE_DEFAULT_SIZE));
+                    Integer.parseInt(Constants.PAGE_DEFAULT_FROM),
+                    Integer.parseInt(Constants.PAGE_DEFAULT_SIZE));
 
             assertEquals(itemsFromController.size(), 2);
 
@@ -568,8 +601,8 @@ public class ItemFullContextTest {
             itemController.delete(itemDto.getId());
 
             assertTrue(itemController.getByOwnerId(userDto.getId(),
-                            Integer.parseInt(UserController.PAGE_DEFAULT_FROM),
-                            Integer.parseInt(UserController.PAGE_DEFAULT_SIZE))
+                            Integer.parseInt(Constants.PAGE_DEFAULT_FROM),
+                            Integer.parseInt(Constants.PAGE_DEFAULT_SIZE))
                     .isEmpty());
         }
 
@@ -649,8 +682,8 @@ public class ItemFullContextTest {
 
             List<ItemDto> itemsFromController = itemController.search(
                     "sEcrEt",
-                    Integer.parseInt(UserController.PAGE_DEFAULT_FROM),
-                    Integer.parseInt(UserController.PAGE_DEFAULT_SIZE));
+                    Integer.parseInt(Constants.PAGE_DEFAULT_FROM),
+                    Integer.parseInt(Constants.PAGE_DEFAULT_SIZE));
 
             assertEquals(itemsFromController.size(), 2);
 
@@ -682,8 +715,8 @@ public class ItemFullContextTest {
 
             List<ItemDto> itemsFromController = itemController.search(
                     " ",
-                    Integer.parseInt(UserController.PAGE_DEFAULT_FROM),
-                    Integer.parseInt(UserController.PAGE_DEFAULT_SIZE));
+                    Integer.parseInt(Constants.PAGE_DEFAULT_FROM),
+                    Integer.parseInt(Constants.PAGE_DEFAULT_SIZE));
 
             assertTrue(itemsFromController.isEmpty());
         }
@@ -852,37 +885,5 @@ public class ItemFullContextTest {
                     () -> itemController.addComment(userDto2.getId(), itemDto.getId(), commentRequestDto));
             assertEquals("Пользователь не брал данную вещь в аренду.", exception.getMessage());
         }
-    }
-
-    private void checkItemExtendedDto(ItemExtendedDto itemFromController, ItemDto itemDto) {
-        assertEquals(itemFromController.getId(), itemDto.getId());
-        assertEquals(itemFromController.getName(), itemDto.getName());
-        assertEquals(itemFromController.getDescription(), itemDto.getDescription());
-        assertEquals(itemFromController.getAvailable(), itemDto.getAvailable());
-        assertEquals(itemFromController.getOwnerId(), itemDto.getOwnerId());
-        assertEquals(itemFromController.getRequestId(), itemDto.getRequestId());
-    }
-
-    private void checkItemExtendedDtoBooking(ItemExtendedDto itemFromController,
-                                             BookingResponseDto lastBookingResponseDto,
-                                             BookingResponseDto nextBookingResponseDto) {
-        assertEquals(itemFromController.getLastBooking().getId(), lastBookingResponseDto.getId());
-        assertEquals(itemFromController.getLastBooking().getBookerId(), lastBookingResponseDto.getBooker().getId());
-        assertEquals(itemFromController.getLastBooking().getStart(), lastBookingResponseDto.getStart());
-        assertEquals(itemFromController.getLastBooking().getEnd(), lastBookingResponseDto.getEnd());
-
-        assertEquals(itemFromController.getNextBooking().getId(), nextBookingResponseDto.getId());
-        assertEquals(itemFromController.getNextBooking().getBookerId(), nextBookingResponseDto.getBooker().getId());
-        assertEquals(itemFromController.getNextBooking().getStart(), nextBookingResponseDto.getStart());
-        assertEquals(itemFromController.getNextBooking().getEnd(), nextBookingResponseDto.getEnd());
-    }
-
-    private void checkItemDto(ItemDto itemDtoFromController, ItemDto itemDto) {
-        assertEquals(itemDtoFromController.getId(), itemDto.getId());
-        assertEquals(itemDtoFromController.getName(), itemDto.getName());
-        assertEquals(itemDtoFromController.getDescription(), itemDto.getDescription());
-        assertEquals(itemDtoFromController.getAvailable(), itemDto.getAvailable());
-        assertEquals(itemDtoFromController.getOwnerId(), itemDto.getOwnerId());
-        assertEquals(itemDtoFromController.getRequestId(), itemDto.getRequestId());
     }
 }

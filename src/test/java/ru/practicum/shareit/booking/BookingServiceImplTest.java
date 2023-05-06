@@ -23,8 +23,8 @@ import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.markers.Constants;
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.UserController;
 import ru.practicum.shareit.user.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -38,26 +38,8 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class BookingServiceImplTest {
-    @Mock
-    private UserService userService;
-
-    @Mock
-    private ItemService itemService;
-
-    @Mock
-    private BookingRepository bookingRepository;
-
-    @Mock
-    private BookingMapperImpl bookingMapper;
-
-    @InjectMocks
-    private BookingServiceImpl bookingService;
-
-    @Captor
-    private ArgumentCaptor<Booking> bookingArgumentCaptor;
-
-    private final int from = Integer.parseInt(UserController.PAGE_DEFAULT_FROM);
-    private final int size = Integer.parseInt(UserController.PAGE_DEFAULT_SIZE);
+    private final int from = Integer.parseInt(Constants.PAGE_DEFAULT_FROM);
+    private final int size = Integer.parseInt(Constants.PAGE_DEFAULT_SIZE);
     private final Pageable pageable = PageRequest.of(from / size, size);
     private final LocalDateTime dateTime = LocalDateTime.of(2023, 1, 1, 10, 0, 0);
     private final User user1 = User.builder()
@@ -87,20 +69,6 @@ public class BookingServiceImplTest {
             .available(true)
             .owner(user1)
             .build();
-    private final ItemDto item1Dto = ItemDto.builder()
-            .id(1L)
-            .name("item1 name")
-            .description("seaRch1 description ")
-            .available(true)
-            .ownerId(user1.getId())
-            .build();
-    private final Item itemIsNoAvailable = Item.builder()
-            .id(3L)
-            .name("item3 name")
-            .description("itEm3 description")
-            .available(false)
-            .owner(user1)
-            .build();
     private final Booking booking = Booking.builder()
             .id(1L)
             .start(dateTime.minusYears(10))
@@ -119,6 +87,13 @@ public class BookingServiceImplTest {
             .end(dateTime)
             .itemId(item1.getId())
             .build();
+    private final ItemDto item1Dto = ItemDto.builder()
+            .id(1L)
+            .name("item1 name")
+            .description("seaRch1 description ")
+            .available(true)
+            .ownerId(user1.getId())
+            .build();
     private final BookingResponseDto bookingResponseDto = BookingResponseDto.builder()
             .id(1L)
             .start(dateTime.minusYears(10))
@@ -127,6 +102,25 @@ public class BookingServiceImplTest {
             .booker(user2Dto)
             .status(Status.APPROVED)
             .build();
+    private final Item itemIsNoAvailable = Item.builder()
+            .id(3L)
+            .name("item3 name")
+            .description("itEm3 description")
+            .available(false)
+            .owner(user1)
+            .build();
+    @Mock
+    private UserService userService;
+    @Mock
+    private ItemService itemService;
+    @Mock
+    private BookingRepository bookingRepository;
+    @Mock
+    private BookingMapperImpl bookingMapper;
+    @InjectMocks
+    private BookingServiceImpl bookingService;
+    @Captor
+    private ArgumentCaptor<Booking> bookingArgumentCaptor;
     private Booking bookingIsWaiting1;
 
     @BeforeEach
@@ -139,6 +133,22 @@ public class BookingServiceImplTest {
                 .booker(user2)
                 .status(Status.WAITING)
                 .build();
+    }
+
+    private void checkBookingResponseDto(Booking booking, BookingResponseDto bookingResponseDto) {
+        assertEquals(booking.getId(), bookingResponseDto.getId());
+        assertEquals(booking.getStart(), bookingResponseDto.getStart());
+        assertEquals(booking.getEnd(), bookingResponseDto.getEnd());
+        assertEquals(booking.getBooker().getId(), bookingResponseDto.getBooker().getId());
+        assertEquals(booking.getBooker().getName(), bookingResponseDto.getBooker().getName());
+        assertEquals(booking.getBooker().getEmail(), bookingResponseDto.getBooker().getEmail());
+        assertEquals(booking.getStatus(), bookingResponseDto.getStatus());
+        assertEquals(booking.getItem().getId(), bookingResponseDto.getItem().getId());
+        assertEquals(booking.getItem().getName(), bookingResponseDto.getItem().getName());
+        assertEquals(booking.getItem().getDescription(), bookingResponseDto.getItem().getDescription());
+        assertEquals(booking.getItem().getAvailable(), bookingResponseDto.getItem().getAvailable());
+        assertEquals(booking.getItem().getRequestId(), bookingResponseDto.getItem().getRequestId());
+        assertEquals(booking.getItem().getOwner().getId(), bookingResponseDto.getItem().getOwnerId());
     }
 
     @Nested
@@ -703,21 +713,5 @@ public class BookingServiceImplTest {
             verify(bookingRepository, times(1)).findById(booking.getId());
             verify(bookingRepository, never()).save(any());
         }
-    }
-
-    private void checkBookingResponseDto(Booking booking, BookingResponseDto bookingResponseDto) {
-        assertEquals(booking.getId(), bookingResponseDto.getId());
-        assertEquals(booking.getStart(), bookingResponseDto.getStart());
-        assertEquals(booking.getEnd(), bookingResponseDto.getEnd());
-        assertEquals(booking.getBooker().getId(), bookingResponseDto.getBooker().getId());
-        assertEquals(booking.getBooker().getName(), bookingResponseDto.getBooker().getName());
-        assertEquals(booking.getBooker().getEmail(), bookingResponseDto.getBooker().getEmail());
-        assertEquals(booking.getStatus(), bookingResponseDto.getStatus());
-        assertEquals(booking.getItem().getId(), bookingResponseDto.getItem().getId());
-        assertEquals(booking.getItem().getName(), bookingResponseDto.getItem().getName());
-        assertEquals(booking.getItem().getDescription(), bookingResponseDto.getItem().getDescription());
-        assertEquals(booking.getItem().getAvailable(), bookingResponseDto.getItem().getAvailable());
-        assertEquals(booking.getItem().getRequestId(), bookingResponseDto.getItem().getRequestId());
-        assertEquals(booking.getItem().getOwner().getId(), bookingResponseDto.getItem().getOwnerId());
     }
 }

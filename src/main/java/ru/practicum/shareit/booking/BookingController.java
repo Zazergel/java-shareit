@@ -8,7 +8,7 @@ import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.enums.State;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.user.UserController;
+import ru.practicum.shareit.markers.Constants;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
@@ -23,17 +23,17 @@ public class BookingController {
     private final BookingService bookingService;
 
     @GetMapping("/{id}")
-    public BookingResponseDto getById(@RequestHeader(UserController.headerUserId) Long userId,
+    public BookingResponseDto getById(@RequestHeader(Constants.headerUserId) Long userId,
                                       @PathVariable Long id) {
         return bookingService.getById(userId, id);
     }
 
     @GetMapping
     public List<BookingResponseDto> getAllByBookerId(
-            @RequestHeader(UserController.headerUserId) Long userId,
-            @RequestParam(defaultValue = "ALL", required = false) String state,
-            @RequestParam(defaultValue = UserController.PAGE_DEFAULT_FROM, required = false) @PositiveOrZero Integer from,
-            @RequestParam(defaultValue = UserController.PAGE_DEFAULT_SIZE, required = false) @Positive Integer size) {
+            @RequestHeader(Constants.headerUserId) Long userId,
+            @RequestParam(defaultValue = "ALL") String state,
+            @RequestParam(defaultValue = Constants.PAGE_DEFAULT_FROM) @PositiveOrZero Integer from,
+            @RequestParam(defaultValue = Constants.PAGE_DEFAULT_SIZE) @Positive Integer size) {
 
         State stateEnum = State.stringToState(state).orElseThrow(
                 () -> new IllegalArgumentException("Unknown state: " + state));
@@ -43,10 +43,10 @@ public class BookingController {
 
     @GetMapping("/owner")
     public List<BookingResponseDto> getAllByOwnerId(
-            @RequestHeader(UserController.headerUserId) Long userId,
-            @RequestParam(defaultValue = "ALL", required = false) String state,
-            @RequestParam(defaultValue = UserController.PAGE_DEFAULT_FROM, required = false) @PositiveOrZero Integer from,
-            @RequestParam(defaultValue = UserController.PAGE_DEFAULT_SIZE, required = false) @Positive Integer size) {
+            @RequestHeader(Constants.headerUserId) Long userId,
+            @RequestParam(defaultValue = "ALL") String state,
+            @RequestParam(defaultValue = Constants.PAGE_DEFAULT_FROM, required = false) @PositiveOrZero Integer from,
+            @RequestParam(defaultValue = Constants.PAGE_DEFAULT_SIZE, required = false) @Positive Integer size) {
         State stateEnum = State.stringToState(state).orElseThrow(
                 () -> new IllegalArgumentException("Unknown state: " + state));
 
@@ -54,15 +54,15 @@ public class BookingController {
     }
 
     @PostMapping
-    public BookingResponseDto add(@RequestHeader(UserController.headerUserId) Long userId,
-                                     @Valid @RequestBody BookingRequestDto bookingRequestDto) {
+    public BookingResponseDto add(@RequestHeader(Constants.headerUserId) Long userId,
+                                  @Valid @RequestBody BookingRequestDto bookingRequestDto) {
         return bookingService.add(userId, bookingRequestDto);
     }
 
     @PatchMapping("/{id}")
-    public BookingResponseDto update(@RequestHeader(UserController.headerUserId) Long userId,
-                                    @PathVariable Long id,
-                                    @RequestParam() Boolean approved) {
+    public BookingResponseDto update(@RequestHeader(Constants.headerUserId) Long userId,
+                                     @PathVariable Long id,
+                                     @RequestParam() Boolean approved) {
         return bookingService.update(userId, id, approved);
     }
 }

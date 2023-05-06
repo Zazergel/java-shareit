@@ -11,23 +11,21 @@ import ru.practicum.shareit.booking.BookingController;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.exceptions.BookingException;
 import ru.practicum.shareit.exceptions.AuthorisationException;
+import ru.practicum.shareit.exceptions.BookingException;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.CommentRequestDto;
-import ru.practicum.shareit.item.ItemController;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemExtendedDto;
+import ru.practicum.shareit.markers.Constants;
 import ru.practicum.shareit.user.UserController;
 import ru.practicum.shareit.user.UserDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -61,8 +59,8 @@ public class ItemControllerTest {
 
             List<ItemExtendedDto> itemsFromController = itemController.getByOwnerId(
                     userDto.getId(),
-                    Integer.parseInt(UserController.PAGE_DEFAULT_FROM),
-                    Integer.parseInt(UserController.PAGE_DEFAULT_SIZE));
+                    Integer.parseInt(Constants.PAGE_DEFAULT_FROM),
+                    Integer.parseInt(Constants.PAGE_DEFAULT_SIZE));
 
             assertEquals(itemsFromController.size(), 1);
 
@@ -141,8 +139,8 @@ public class ItemControllerTest {
 
             List<ItemExtendedDto> itemsFromController1 = itemController.getByOwnerId(
                     userDto1.getId(),
-                    Integer.parseInt(UserController.PAGE_DEFAULT_FROM),
-                    Integer.parseInt(UserController.PAGE_DEFAULT_SIZE));
+                    Integer.parseInt(Constants.PAGE_DEFAULT_FROM),
+                    Integer.parseInt(Constants.PAGE_DEFAULT_SIZE));
 
             assertEquals(itemsFromController1.size(), 2);
 
@@ -165,8 +163,8 @@ public class ItemControllerTest {
 
             List<ItemExtendedDto> itemsFromController2 = itemController.getByOwnerId(
                     userDto2.getId(),
-                    Integer.parseInt(UserController.PAGE_DEFAULT_FROM),
-                    Integer.parseInt(UserController.PAGE_DEFAULT_SIZE));
+                    Integer.parseInt(Constants.PAGE_DEFAULT_FROM),
+                    Integer.parseInt(Constants.PAGE_DEFAULT_SIZE));
 
             assertEquals(itemsFromController2.size(), 1);
 
@@ -191,8 +189,8 @@ public class ItemControllerTest {
 
             List<ItemExtendedDto> itemsFromController = itemController.getByOwnerId(
                     userDto.getId(),
-                    Integer.parseInt(UserController.PAGE_DEFAULT_FROM),
-                    Integer.parseInt(UserController.PAGE_DEFAULT_SIZE));
+                    Integer.parseInt(Constants.PAGE_DEFAULT_FROM),
+                    Integer.parseInt(Constants.PAGE_DEFAULT_SIZE));
 
             assertEquals(itemsFromController.size(), 0);
         }
@@ -250,12 +248,12 @@ public class ItemControllerTest {
             bookingController.update(userDto1.getId(), bookingResponseDto2.getId(), true);
 
             CommentRequestDto commentRequestDto = new CommentRequestDto("comment");
-            itemController.addComment(userDto2.getId(),itemDto1.getId(), commentRequestDto);
+            itemController.addComment(userDto2.getId(), itemDto1.getId(), commentRequestDto);
 
             List<ItemExtendedDto> itemsFromController = itemController.getByOwnerId(
                     userDto1.getId(),
-                    Integer.parseInt(UserController.PAGE_DEFAULT_FROM),
-                    Integer.parseInt(UserController.PAGE_DEFAULT_SIZE));
+                    Integer.parseInt(Constants.PAGE_DEFAULT_FROM),
+                    Integer.parseInt(Constants.PAGE_DEFAULT_SIZE));
 
             assertEquals(itemsFromController.size(), 2);
 
@@ -387,7 +385,7 @@ public class ItemControllerTest {
             bookingController.update(userDto1.getId(), bookingResponseDto2.getId(), true);
 
             CommentRequestDto commentRequestDto = new CommentRequestDto("comment");
-            itemController.addComment(userDto2.getId(),itemDto1.getId(), commentRequestDto);
+            itemController.addComment(userDto2.getId(), itemDto1.getId(), commentRequestDto);
 
             ItemExtendedDto itemFromController1 = itemController.getById(userDto1.getId(), itemDto1.getId());
 
@@ -473,7 +471,7 @@ public class ItemControllerTest {
             bookingController.update(userDto1.getId(), bookingResponseDto2.getId(), true);
 
             CommentRequestDto commentRequestDto = new CommentRequestDto("comment");
-            itemController.addComment(userDto2.getId(),itemDto1.getId(), commentRequestDto);
+            itemController.addComment(userDto2.getId(), itemDto1.getId(), commentRequestDto);
 
             ItemExtendedDto itemFromController1 = itemController.getById(userDto2.getId(), itemDto1.getId());
 
@@ -615,8 +613,8 @@ public class ItemControllerTest {
             itemController.delete(itemDto.getId());
 
             assertEquals(itemController.getByOwnerId(userDto.getId(),
-                            Integer.parseInt(UserController.PAGE_DEFAULT_FROM),
-                            Integer.parseInt(UserController.PAGE_DEFAULT_SIZE)).size(),
+                            Integer.parseInt(Constants.PAGE_DEFAULT_FROM),
+                            Integer.parseInt(Constants.PAGE_DEFAULT_SIZE)).size(),
                     0);
         }
 
@@ -696,8 +694,8 @@ public class ItemControllerTest {
 
             List<ItemDto> itemsFromController = itemController.search(
                     "sEcrEt",
-                    Integer.parseInt(UserController.PAGE_DEFAULT_FROM),
-                    Integer.parseInt(UserController.PAGE_DEFAULT_SIZE));
+                    Integer.parseInt(Constants.PAGE_DEFAULT_FROM),
+                    Integer.parseInt(Constants.PAGE_DEFAULT_SIZE));
 
             assertEquals(itemsFromController.size(), 2);
 
@@ -740,8 +738,8 @@ public class ItemControllerTest {
 
             List<ItemDto> itemsFromController = itemController.search(
                     " ",
-                    Integer.parseInt(UserController.PAGE_DEFAULT_FROM),
-                    Integer.parseInt(UserController.PAGE_DEFAULT_SIZE));
+                    Integer.parseInt(Constants.PAGE_DEFAULT_FROM),
+                    Integer.parseInt(Constants.PAGE_DEFAULT_SIZE));
 
             assertEquals(itemsFromController.size(), 0);
         }
@@ -784,7 +782,7 @@ public class ItemControllerTest {
             bookingController.update(userDto1.getId(), bookingResponseDto.getId(), true);
 
             CommentRequestDto commentRequestDto = new CommentRequestDto("comment");
-            itemController.addComment(userDto2.getId(),itemDto.getId(), commentRequestDto);
+            itemController.addComment(userDto2.getId(), itemDto.getId(), commentRequestDto);
 
             ItemExtendedDto item = itemController.getById(userDto1.getId(), itemDto.getId());
 
@@ -826,7 +824,7 @@ public class ItemControllerTest {
             CommentRequestDto commentRequestDto = new CommentRequestDto("comment");
 
             BookingException exception = assertThrows(BookingException.class,
-                    () -> itemController.addComment(userDto2.getId(),itemDto.getId(), commentRequestDto));
+                    () -> itemController.addComment(userDto2.getId(), itemDto.getId(), commentRequestDto));
             assertEquals("Пользователь не брал данную вещь в аренду.", exception.getMessage());
         }
 
@@ -867,7 +865,7 @@ public class ItemControllerTest {
             CommentRequestDto commentRequestDto = new CommentRequestDto("comment");
 
             BookingException exception = assertThrows(BookingException.class,
-                    () -> itemController.addComment(userDto2.getId(),itemDto.getId(), commentRequestDto));
+                    () -> itemController.addComment(userDto2.getId(), itemDto.getId(), commentRequestDto));
             assertEquals("Пользователь не брал данную вещь в аренду.", exception.getMessage());
         }
 
@@ -907,7 +905,7 @@ public class ItemControllerTest {
             CommentRequestDto commentRequestDto = new CommentRequestDto("comment");
 
             BookingException exception = assertThrows(BookingException.class,
-                    () -> itemController.addComment(userDto2.getId(),itemDto.getId(), commentRequestDto));
+                    () -> itemController.addComment(userDto2.getId(), itemDto.getId(), commentRequestDto));
             assertEquals("Пользователь не брал данную вещь в аренду.", exception.getMessage());
         }
     }

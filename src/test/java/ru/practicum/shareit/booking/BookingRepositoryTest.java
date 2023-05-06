@@ -13,8 +13,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.booking.enums.Status;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.markers.Constants;
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.UserController;
 import ru.practicum.shareit.user.UserRepository;
 
 import java.time.LocalDateTime;
@@ -32,8 +32,8 @@ public class BookingRepositoryTest {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
 
-    private final int from = Integer.parseInt(UserController.PAGE_DEFAULT_FROM);
-    private final int size = Integer.parseInt(UserController.PAGE_DEFAULT_SIZE);
+    private final int from = Integer.parseInt(Constants.PAGE_DEFAULT_FROM);
+    private final int size = Integer.parseInt(Constants.PAGE_DEFAULT_SIZE);
     private final Pageable pageable = PageRequest.of(from / size, size);
     private final LocalDateTime dateTime = LocalDateTime.of(2023, 1, 1, 10, 0, 0);
     private final User user1 = User.builder()

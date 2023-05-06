@@ -26,10 +26,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class UserControllerTest {
     private final ObjectMapper mapper;
     private final MockMvc mvc;
-
-    @MockBean
-    private UserService userService;
-
     private final UserDto userDto1 = UserDto.builder()
             .id(1L)
             .name("Test user 1")
@@ -40,6 +36,8 @@ public class UserControllerTest {
             .name("Test user 2")
             .email("tester2@yandex.ru")
             .build();
+    @MockBean
+    private UserService userService;
     private UserDto userDtoToPatch;
     private UserDto userDtoPatched;
 

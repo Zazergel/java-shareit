@@ -22,6 +22,12 @@ import static org.junit.jupiter.api.Assertions.*;
 public class UserControllerFullContextTest {
     private final UserController userController;
 
+    private void checkUserDto(UserDto userDto, UserDto userDtoFromController) {
+        assertEquals(userDto.getId(), userDtoFromController.getId());
+        assertEquals(userDto.getName(), userDtoFromController.getName());
+        assertEquals(userDto.getEmail(), userDtoFromController.getEmail());
+    }
+
     @Nested
     class Add {
         @Test
@@ -222,11 +228,5 @@ public class UserControllerFullContextTest {
 
             assertTrue(userController.getAll().isEmpty());
         }
-    }
-
-    private void checkUserDto(UserDto userDto, UserDto userDtoFromController) {
-        assertEquals(userDto.getId(), userDtoFromController.getId());
-        assertEquals(userDto.getName(), userDtoFromController.getName());
-        assertEquals(userDto.getEmail(), userDtoFromController.getEmail());
     }
 }

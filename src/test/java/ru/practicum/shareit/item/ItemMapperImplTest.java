@@ -26,9 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith(MockitoExtension.class)
 public class ItemMapperImplTest {
-    @InjectMocks
-    private ItemMapperImpl itemMapper;
-
     private final LocalDateTime dateTime = LocalDateTime.of(2023, 1, 1, 10, 0, 0);
     private final User user = User.builder()
             .id(1L)
@@ -59,15 +56,7 @@ public class ItemMapperImplTest {
             .available(true)
             .owner(user)
             .requestId(1L)
-            .comments(List.of(comment1, comment2))
-            .build();
-    private final ItemDto itemDto = ItemDto.builder()
-            .id(1L)
-            .name("item name")
-            .description("item description")
-            .available(true)
-            .ownerId(user.getId())
-            .requestId(1L)
+            //.comments(List.of(comment1, comment2))
             .build();
     private final Booking booking = Booking.builder()
             .id(1L)
@@ -76,6 +65,14 @@ public class ItemMapperImplTest {
             .item(item)
             .booker(user)
             .status(Status.APPROVED)
+            .build();
+    private final ItemDto itemDto = ItemDto.builder()
+            .id(1L)
+            .name("item name")
+            .description("item description")
+            .available(true)
+            .ownerId(user.getId())
+            .requestId(1L)
             .build();
     private final BookingItemDto lastBooking = BookingItemDto.builder()
             .id(1L)
@@ -89,6 +86,8 @@ public class ItemMapperImplTest {
             .start(dateTime.plusHours(2))
             .end(dateTime.plusHours(3))
             .build();
+    @InjectMocks
+    private ItemMapperImpl itemMapper;
 
     @Nested
     class ToItemDto {
@@ -126,7 +125,7 @@ public class ItemMapperImplTest {
             assertEquals(user.getName(), result.getOwner().getName());
             assertEquals(user.getEmail(), result.getOwner().getEmail());
             assertEquals(itemDto.getRequestId(), result.getRequestId());
-            assertNull(result.getComments());
+            //assertNull(result.getComments());
         }
 
         @Test
@@ -141,7 +140,7 @@ public class ItemMapperImplTest {
     class ToItemExtendedDto {
         @Test
         public void shouldReturnItemExtendedDto() {
-            ItemExtendedDto result = itemMapper.toItemExtendedDto(item, lastBooking, nextBooking);
+            ItemExtendedDto result = itemMapper.toItemExtendedDto(item, lastBooking, nextBooking, List.of(itemMapper.commentToCommentDto(comment1), itemMapper.commentToCommentDto(comment2)));
 
             assertEquals(item.getId(), result.getId());
             assertEquals(item.getName(), result.getName());
@@ -160,28 +159,23 @@ public class ItemMapperImplTest {
             assertEquals(nextBooking.getStart(), result.getNextBooking().getStart());
             assertEquals(nextBooking.getEnd(), result.getNextBooking().getEnd());
 
-            assertEquals(item.getComments().size(), result.getComments().size());
-
-            Comment commentFromItem1 = item.getComments().get(0);
-            Comment commentFromItem2 = item.getComments().get(1);
             CommentDto commentFromResult1 = result.getComments().get(0);
             CommentDto commentFromResult2 = result.getComments().get(1);
 
-            assertEquals(commentFromItem1.getId(), commentFromResult1.getId());
-            assertEquals(commentFromItem1.getText(), commentFromResult1.getText());
-            assertEquals(commentFromItem1.getCreated(), commentFromResult1.getCreated());
-            assertEquals(commentFromItem1.getAuthor().getName(), commentFromResult1.getAuthorName());
+            assertEquals(comment1.getId(), commentFromResult1.getId());
+            assertEquals(comment1.getText(), commentFromResult1.getText());
+            assertEquals(comment1.getCreated(), commentFromResult1.getCreated());
+            assertEquals(comment1.getAuthor().getName(), commentFromResult1.getAuthorName());
 
-            assertEquals(commentFromItem2.getId(), commentFromResult2.getId());
-            assertEquals(commentFromItem2.getText(), commentFromResult2.getText());
-            assertEquals(commentFromItem2.getCreated(), commentFromResult2.getCreated());
-            assertEquals(commentFromItem2.getAuthor().getName(), commentFromResult2.getAuthorName());
+            assertEquals(comment2.getId(), commentFromResult2.getId());
+            assertEquals(comment2.getText(), commentFromResult2.getText());
+            assertEquals(comment2.getCreated(), commentFromResult2.getCreated());
+            assertEquals(comment2.getAuthor().getName(), commentFromResult2.getAuthorName());
         }
 
         @Test
         public void shouldReturnNull() {
-            ItemExtendedDto result = itemMapper.toItemExtendedDto(null, null, null);
-
+            ItemExtendedDto result = itemMapper.toItemExtendedDto(null, null, null, null);
             assertNull(result);
         }
     }

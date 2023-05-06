@@ -12,9 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith(MockitoExtension.class)
 class UserMapperImplTest {
-    @InjectMocks
-    private UserMapperImpl userMapper;
-
     private final User user = User.builder()
             .id(1L)
             .name("Test user 1")
@@ -25,6 +22,8 @@ class UserMapperImplTest {
             .name("Test user 1")
             .email("tester1@yandex.ru")
             .build();
+    @InjectMocks
+    private UserMapperImpl userMapper;
 
     @Nested
     class ToUserDto {

@@ -28,8 +28,8 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
+import ru.practicum.shareit.markers.Constants;
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.UserController;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
@@ -42,33 +42,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ItemServiceImplTest {
-    @Mock
-    private UserService userService;
-
-    @Mock
-    private ItemRepository itemRepository;
-
-    @Mock
-    private BookingRepository bookingRepository;
-
-    @Mock
-    private CommentRepository commentRepository;
-
-    @Mock
-    private ItemMapperImpl itemMapper;
-
-    @InjectMocks
-    private ItemServiceImpl itemService;
-
-    @Captor
-    private ArgumentCaptor<Item> itemArgumentCaptor;
-
-    @Captor
-    private ArgumentCaptor<Comment> commentArgumentCaptor;
-
     private final LocalDateTime dateTime = LocalDateTime.of(2023, 1, 1, 10, 0, 0);
-    private final int from = Integer.parseInt(UserController.PAGE_DEFAULT_FROM);
-    private final int size = Integer.parseInt(UserController.PAGE_DEFAULT_SIZE);
+    private final int from = Integer.parseInt(Constants.PAGE_DEFAULT_FROM);
+    private final int size = Integer.parseInt(Constants.PAGE_DEFAULT_SIZE);
     private final Pageable pageable = PageRequest.of(from / size, size);
     private final User user1 = User.builder()
             .id(1L)
@@ -86,32 +62,6 @@ public class ItemServiceImplTest {
             .description("seaRch1 description ")
             .available(true)
             .owner(user1)
-            .build();
-    private final Item item2 = Item.builder()
-            .id(2L)
-            .name("item2 name")
-            .description("SeARch1 description")
-            .available(true)
-            .owner(user2)
-            .build();
-    private final Item item3 = Item.builder()
-            .id(3L)
-            .name("item3 name")
-            .description("itEm3 description")
-            .available(false)
-            .owner(user1)
-            .build();
-    private final ItemDto item1DtoToUpdate = ItemDto.builder()
-            .id(1L)
-            .name("Update item1 name")
-            .description("Update seaRch1 description")
-            .available(false)
-            .build();
-    private final ItemDto item1DtoToUpdateBlank = ItemDto.builder()
-            .id(1L)
-            .name(" ")
-            .description(" ")
-            .available(null)
             .build();
     private final Booking booking1 = Booking.builder()
             .id(1L)
@@ -145,6 +95,32 @@ public class ItemServiceImplTest {
             .booker(user2)
             .status(Status.REJECTED)
             .build();
+    private final Item item2 = Item.builder()
+            .id(2L)
+            .name("item2 name")
+            .description("SeARch1 description")
+            .available(true)
+            .owner(user2)
+            .build();
+    private final Item item3 = Item.builder()
+            .id(3L)
+            .name("item3 name")
+            .description("itEm3 description")
+            .available(false)
+            .owner(user1)
+            .build();
+    private final ItemDto item1DtoToUpdate = ItemDto.builder()
+            .id(1L)
+            .name("Update item1 name")
+            .description("Update seaRch1 description")
+            .available(false)
+            .build();
+    private final ItemDto item1DtoToUpdateBlank = ItemDto.builder()
+            .id(1L)
+            .name(" ")
+            .description(" ")
+            .available(null)
+            .build();
     private final Comment comment1 = Comment.builder()
             .id(1L)
             .text("comment1 text")
@@ -155,18 +131,34 @@ public class ItemServiceImplTest {
     private final CommentRequestDto comment1RequestDto = CommentRequestDto.builder()
             .text("commentRequestDto text")
             .build();
+    @Mock
+    private UserService userService;
+    @Mock
+    private ItemRepository itemRepository;
+    @Mock
+    private BookingRepository bookingRepository;
+    @Mock
+    private CommentRepository commentRepository;
+    @Mock
+    private ItemMapperImpl itemMapper;
+    @InjectMocks
+    private ItemServiceImpl itemService;
+    @Captor
+    private ArgumentCaptor<Item> itemArgumentCaptor;
+    @Captor
+    private ArgumentCaptor<Comment> commentArgumentCaptor;
 
     @Nested
     class GetByOwnerId {
         @Test
         public void shouldGetTwoItems() {
             when(itemRepository.findByOwnerIdOrderByIdAsc(any(), any())).thenReturn(new PageImpl<>(List.of(item1, item3)));
-            when(itemMapper.toItemExtendedDto(any(), any(), any())).thenCallRealMethod();
+            when(itemMapper.toItemExtendedDto(any(), any(), any(), any())).thenCallRealMethod();
 
             itemService.getByOwnerId(user1.getId(), pageable);
 
             verify(itemRepository, times(1)).findByOwnerIdOrderByIdAsc(any(), any());
-            verify(itemMapper, times(2)).toItemExtendedDto(any(), any(), any());
+            verify(itemMapper, times(2)).toItemExtendedDto(any(), any(), any(), any());
         }
 
         @Test
@@ -176,7 +168,7 @@ public class ItemServiceImplTest {
             itemService.getByOwnerId(user1.getId(), pageable);
 
             verify(itemRepository, times(1)).findByOwnerIdOrderByIdAsc(any(), any());
-            verify(itemMapper, never()).toItemExtendedDto(any(), any(), any());
+            verify(itemMapper, never()).toItemExtendedDto(any(), any(), any(), any());
         }
     }
 
@@ -207,20 +199,20 @@ public class ItemServiceImplTest {
         @Test
         public void shouldGetByNotOwner() {
             when(itemRepository.findById(item1.getId())).thenReturn(Optional.of(item1));
-            when(itemMapper.toItemExtendedDto(any(), any(), any())).thenCallRealMethod();
+            when(itemMapper.toItemExtendedDto(any(), any(), any(), any())).thenCallRealMethod();
 
             ItemExtendedDto itemFromService = itemService.getById(user2.getId(), item1.getId());
 
             assertNull(itemFromService.getLastBooking());
             assertNull(itemFromService.getNextBooking());
             verify(itemRepository, times(1)).findById(any());
-            verify(itemMapper, times(1)).toItemExtendedDto(any(), any(), any());
+            verify(itemMapper, times(1)).toItemExtendedDto(any(), any(), any(), any());
         }
 
         @Test
         public void shouldGetByOwnerWithLastAndNextBookings() {
             when(itemRepository.findById(item1.getId())).thenReturn(Optional.of(item1));
-            when(itemMapper.toItemExtendedDto(any(), any(), any())).thenCallRealMethod();
+            when(itemMapper.toItemExtendedDto(any(), any(), any(), any())).thenCallRealMethod();
             when(bookingRepository.findByItemIdAndStartBeforeAndStatusEqualsOrderByStartDesc(any(), any(), any()))
                     .thenReturn(List.of(booking2, booking1));
             when(bookingRepository.findByItemIdAndStartAfterAndStatusEqualsOrderByStartAsc(any(), any(), any()))
@@ -242,7 +234,7 @@ public class ItemServiceImplTest {
             assertEquals(booking3.getEnd(), itemFromService.getNextBooking().getEnd());
 
             verify(itemRepository, times(1)).findById(any());
-            verify(itemMapper, times(1)).toItemExtendedDto(any(), any(), any());
+            verify(itemMapper, times(1)).toItemExtendedDto(any(), any(), any(), any());
             verify(bookingRepository, times(1))
                     .findByItemIdAndStartBeforeAndStatusEqualsOrderByStartDesc(any(), any(), any());
             verify(bookingRepository, times(1))
@@ -253,7 +245,7 @@ public class ItemServiceImplTest {
         @Test
         public void shouldGetByOwnerWithEmptyLastAndNextBookings() {
             when(itemRepository.findById(item1.getId())).thenReturn(Optional.of(item1));
-            when(itemMapper.toItemExtendedDto(any(), any(), any())).thenCallRealMethod();
+            when(itemMapper.toItemExtendedDto(any(), any(), any(), any())).thenCallRealMethod();
             when(bookingRepository.findByItemIdAndStartBeforeAndStatusEqualsOrderByStartDesc(any(), any(), any()))
                     .thenReturn(List.of());
             when(bookingRepository.findByItemIdAndStartAfterAndStatusEqualsOrderByStartAsc(any(), any(), any()))
@@ -265,7 +257,7 @@ public class ItemServiceImplTest {
             assertNull(itemFromService.getNextBooking());
 
             verify(itemRepository, times(1)).findById(any());
-            verify(itemMapper, times(1)).toItemExtendedDto(any(), any(), any());
+            verify(itemMapper, times(1)).toItemExtendedDto(any(), any(), any(), any());
             verify(bookingRepository, times(1))
                     .findByItemIdAndStartBeforeAndStatusEqualsOrderByStartDesc(any(), any(), any());
             verify(bookingRepository, times(1))

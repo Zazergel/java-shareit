@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.request.ItemRequestMapper;
 import ru.practicum.shareit.request.ItemRequestRepository;
@@ -20,7 +21,9 @@ import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,6 +35,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemRequestRepository itemRequestRepository;
     private final ItemRequestMapper itemRequestMapper;
     private final ItemMapper itemMapper;
+    private final ItemRepository itemRepository;
 
     @Override
     @Transactional
@@ -52,8 +56,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         ItemRequest itemRequest = itemRequestRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Запроса вещи с таким id не существует."));
 
-        List<ItemDto> items = itemRequest.getItems().stream()
-                .map(itemMapper::toItemDto)
+        List<ItemDto> items = itemRepository.findByRequestId(itemRequest.getId())
+                .stream().map(itemMapper::toItemDto)
                 .collect(Collectors.toList());
 
         return itemRequestMapper.toItemRequestExtendedDto(itemRequest, items);
@@ -66,15 +70,32 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         userService.getUserById(userId);
         List<ItemRequest> itemRequests = itemRequestRepository.findByRequesterId_IdOrderByCreatedAsc(userId);
 
-        return itemRequests.stream()
+        List<Long> itemRequestIds = itemRequests.stream()
+                .map(ItemRequest::getId)
+                .collect(Collectors.toList());
+
+        Map<Long, List<ItemDto>> itemDtosForRequestId = itemRepository.findByRequestIdIn(itemRequestIds)
+                .stream()
+                .map(itemMapper::toItemDto)
+                .collect(Collectors.groupingBy(ItemDto::getRequestId));
+
+        List<ItemRequestExtendedDto> result = itemRequests
+                .stream()
+                .filter(itemRequest -> itemRequest.getRequesterId().getId().equals(userId))
                 .map((itemRequest) -> itemRequestMapper.toItemRequestExtendedDto(
                         itemRequest,
-                        itemRequest.getItems()
-                                .stream()
-                                .map(itemMapper::toItemDto)
-                                .collect(Collectors.toList()))
+                        null)
                 )
                 .collect(Collectors.toList());
+
+        for (ItemRequestExtendedDto itemRequestExtendedDto : result) {
+            if (itemDtosForRequestId.get(itemRequestExtendedDto.getId()) != null && !itemDtosForRequestId.get(itemRequestExtendedDto.getId()).isEmpty()) {
+                itemRequestExtendedDto.setItems(itemDtosForRequestId.get(itemRequestExtendedDto.getId()));
+            } else {
+                itemRequestExtendedDto.setItems(new ArrayList<>());
+            }
+        }
+        return result;
     }
 
     @Override
@@ -83,15 +104,16 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
         userService.getUserById(userId);
         Page<ItemRequest> itemRequests = itemRequestRepository.findByRequesterId_IdNot(userId, pageable);
+        List<Long> itemRequestIds = itemRequests.stream().map(ItemRequest::getId).collect(Collectors.toList());
+        Map<Long, List<ItemDto>> itemDtosForRequestId = itemRepository.findByRequestIdIn(itemRequestIds)
+                .stream()
+                .map(itemMapper::toItemDto)
+                .collect(Collectors.groupingBy(ItemDto::getRequestId));
 
         return itemRequests.stream()
                 .map((itemRequest) -> itemRequestMapper.toItemRequestExtendedDto(
                         itemRequest,
-                        itemRequest.getItems()
-                                .stream()
-                                .map(itemMapper::toItemDto)
-                                .collect(Collectors.toList()))
-                )
+                        itemDtosForRequestId.get(itemRequest.getId())))
                 .collect(Collectors.toList());
     }
 }

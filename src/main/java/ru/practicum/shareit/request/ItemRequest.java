@@ -5,12 +5,10 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -30,17 +28,13 @@ public class ItemRequest {
     @Column(nullable = false)
     String description;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "REQUESTER_ID", referencedColumnName = "ID", nullable = false)
     User requesterId;
 
     @Column(nullable = false)
     LocalDateTime created;
-
-    @OneToMany
-    @JoinColumn(name = "REQUEST_ID", referencedColumnName = "ID")
-    List<Item> items;
 
     @Override
     public boolean equals(Object o) {
@@ -51,6 +45,6 @@ public class ItemRequest {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, description, requesterId, created, items);
+        return Objects.hash(id, description, requesterId, created);
     }
 }

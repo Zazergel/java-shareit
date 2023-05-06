@@ -14,7 +14,6 @@ import ru.practicum.shareit.user.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface ItemMapper {
@@ -30,8 +29,9 @@ public interface ItemMapper {
     @Mapping(target = "ownerId", expression = "java(item.getOwner().getId())")
     @Mapping(target = "lastBooking", expression = "java(lastBooking)")
     @Mapping(target = "nextBooking", expression = "java(nextBooking)")
-    @Mapping(target = "comments", expression = "java(commentsToCommentsDto(item.getComments()))")
-    ItemExtendedDto toItemExtendedDto(Item item, BookingItemDto lastBooking, BookingItemDto nextBooking);
+    @Mapping(target = "comments", expression = "java(comments)")
+    ItemExtendedDto toItemExtendedDto(Item item, BookingItemDto lastBooking, BookingItemDto nextBooking,
+                                      List<CommentDto> comments);
 
     @Mapping(target = "bookerId", expression = "java(booking.getBooker().getId())")
     BookingItemDto bookingToBookingItemDto(Booking booking);
@@ -44,11 +44,5 @@ public interface ItemMapper {
 
     @Mapping(target = "authorName", expression = "java(comment.getAuthor().getName())")
     CommentDto commentToCommentDto(Comment comment);
-
-    default List<CommentDto> commentsToCommentsDto(List<Comment> comments) {
-        return comments.stream()
-                .map(this::commentToCommentDto)
-                .collect(Collectors.toList());
-    }
 }
 

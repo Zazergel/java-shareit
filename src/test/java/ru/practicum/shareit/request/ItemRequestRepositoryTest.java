@@ -12,8 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.markers.Constants;
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.UserController;
 import ru.practicum.shareit.user.UserRepository;
 
 import java.time.LocalDateTime;
@@ -31,8 +31,8 @@ public class ItemRequestRepositoryTest {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
 
-    private final int from = Integer.parseInt(UserController.PAGE_DEFAULT_FROM);
-    private final int size = Integer.parseInt(UserController.PAGE_DEFAULT_SIZE);
+    private final int from = Integer.parseInt(Constants.PAGE_DEFAULT_FROM);
+    private final int size = Integer.parseInt(Constants.PAGE_DEFAULT_SIZE);
     private final Pageable pageable = PageRequest.of(from / size, size);
     private final LocalDateTime dateTime = LocalDateTime.of(2023, 1, 1, 10, 0, 0);
     private final User user1 = User.builder()
@@ -58,7 +58,6 @@ public class ItemRequestRepositoryTest {
             .description("itemRequest1 description")
             .requesterId(user2)
             .created(dateTime)
-            .items(null)
             .build();
 
     @BeforeEach
@@ -67,6 +66,15 @@ public class ItemRequestRepositoryTest {
         userRepository.save(user2);
         itemRequestRepository.save(itemRequest1);
         itemRepository.save(item1);
+    }
+
+    private void checkItemRequest(ItemRequest itemRequest, User user, LocalDateTime dateTime, ItemRequest resultItemRequest) {
+        assertEquals(itemRequest.getId(), resultItemRequest.getId());
+        assertEquals(itemRequest.getDescription(), resultItemRequest.getDescription());
+        assertEquals(user.getId(), resultItemRequest.getRequesterId().getId());
+        assertEquals(user.getName(), resultItemRequest.getRequesterId().getName());
+        assertEquals(user.getEmail(), resultItemRequest.getRequesterId().getEmail());
+        assertEquals(dateTime, resultItemRequest.getCreated());
     }
 
     @Nested
@@ -111,14 +119,5 @@ public class ItemRequestRepositoryTest {
 
             checkItemRequest(itemRequest1, user2, dateTime, resultItemRequest);
         }
-    }
-
-    private void checkItemRequest(ItemRequest itemRequest, User user, LocalDateTime dateTime, ItemRequest resultItemRequest) {
-        assertEquals(itemRequest.getId(), resultItemRequest.getId());
-        assertEquals(itemRequest.getDescription(), resultItemRequest.getDescription());
-        assertEquals(user.getId(), resultItemRequest.getRequesterId().getId());
-        assertEquals(user.getName(), resultItemRequest.getRequesterId().getName());
-        assertEquals(user.getEmail(), resultItemRequest.getRequesterId().getEmail());
-        assertEquals(dateTime, resultItemRequest.getCreated());
     }
 }

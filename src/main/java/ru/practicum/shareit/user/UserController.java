@@ -14,9 +14,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-    public static final String headerUserId = "X-Sharer-User-Id";
-    public static final String PAGE_DEFAULT_FROM = "0";
-    public static final String PAGE_DEFAULT_SIZE = "10";
 
     @GetMapping
     public List<UserDto> getAll() {

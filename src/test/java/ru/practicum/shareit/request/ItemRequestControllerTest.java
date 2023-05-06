@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.item.ItemController;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.markers.Constants;
 import ru.practicum.shareit.request.dto.ItemRequestAddDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestExtendedDto;
@@ -188,8 +189,8 @@ public class ItemRequestControllerTest {
 
             List<ItemRequestExtendedDto> itemRequestsFromController = itemRequestController.getAll(
                     userDto2.getId(),
-                    Integer.parseInt(UserController.PAGE_DEFAULT_FROM),
-                    Integer.parseInt(UserController.PAGE_DEFAULT_SIZE));
+                    Integer.parseInt(Constants.PAGE_DEFAULT_FROM),
+                    Integer.parseInt(Constants.PAGE_DEFAULT_SIZE));
 
             assertEquals(1, itemRequestsFromController.size());
 

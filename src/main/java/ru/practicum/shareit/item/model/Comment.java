@@ -30,7 +30,7 @@ public class Comment {
     @Column(name = "CREATED_DATE", nullable = false)
     LocalDateTime created;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "AUTHOR_ID", referencedColumnName = "ID", nullable = false)
     User author;

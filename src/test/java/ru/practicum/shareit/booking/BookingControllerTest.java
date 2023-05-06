@@ -19,8 +19,8 @@ import ru.practicum.shareit.booking.enums.State;
 import ru.practicum.shareit.booking.enums.Status;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.markers.Constants;
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.UserController;
 import ru.practicum.shareit.user.UserDto;
 
 import java.nio.charset.StandardCharsets;
@@ -37,10 +37,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class BookingControllerTest {
     private final ObjectMapper mapper;
     private final MockMvc mvc;
-
-    @MockBean
-    private BookingService bookingService;
-
     private final User user1 = User.builder()
             .id(1L)
             .name("Test user 1")
@@ -80,6 +76,8 @@ public class BookingControllerTest {
             .booker(userDto2)
             .status(Status.WAITING)
             .build();
+    @MockBean
+    private BookingService bookingService;
     private BookingRequestDto bookingRequestDto;
     private BookingResponseDto bookingResponseDto;
     private int from;
@@ -100,8 +98,8 @@ public class BookingControllerTest {
                 .booker(userDto2)
                 .status(Status.WAITING)
                 .build();
-        from = Integer.parseInt(UserController.PAGE_DEFAULT_FROM);
-        size = Integer.parseInt(UserController.PAGE_DEFAULT_SIZE);
+        from = Integer.parseInt(Constants.PAGE_DEFAULT_FROM);
+        size = Integer.parseInt(Constants.PAGE_DEFAULT_SIZE);
     }
 
     @Nested
@@ -112,7 +110,7 @@ public class BookingControllerTest {
                     .thenReturn(bookingResponseDto1);
 
             mvc.perform(post("/bookings")
-                            .header(UserController.headerUserId, user2.getId())
+                            .header(Constants.headerUserId, user2.getId())
                             .content(mapper.writeValueAsString(bookingRequestDto))
                             .characterEncoding(StandardCharsets.UTF_8)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -130,7 +128,7 @@ public class BookingControllerTest {
             bookingRequestDto.setEnd(LocalDateTime.now().plusMinutes(10));
 
             mvc.perform(post("/bookings")
-                            .header(UserController.headerUserId, user2.getId())
+                            .header(Constants.headerUserId, user2.getId())
                             .content(mapper.writeValueAsString(bookingRequestDto))
                             .characterEncoding(StandardCharsets.UTF_8)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -146,7 +144,7 @@ public class BookingControllerTest {
             bookingRequestDto.setEnd(LocalDateTime.now());
 
             mvc.perform(post("/bookings")
-                            .header(UserController.headerUserId, user2.getId())
+                            .header(Constants.headerUserId, user2.getId())
                             .content(mapper.writeValueAsString(bookingRequestDto))
                             .characterEncoding(StandardCharsets.UTF_8)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -161,7 +159,7 @@ public class BookingControllerTest {
             bookingRequestDto.setItemId(null);
 
             mvc.perform(post("/bookings")
-                            .header(UserController.headerUserId, user2.getId())
+                            .header(Constants.headerUserId, user2.getId())
                             .content(mapper.writeValueAsString(bookingRequestDto))
                             .characterEncoding(StandardCharsets.UTF_8)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -183,7 +181,7 @@ public class BookingControllerTest {
                     .thenReturn(bookingResponseDto);
 
             mvc.perform(patch("/bookings/{id}?approved={approved}", bookingResponseDto.getId(), true)
-                            .header(UserController.headerUserId, user2.getId()))
+                            .header(Constants.headerUserId, user2.getId()))
                     .andExpect(status().isOk())
                     .andExpect(content().json(mapper.writeValueAsString(bookingResponseDto)));
 
@@ -200,7 +198,7 @@ public class BookingControllerTest {
                     .thenReturn(bookingResponseDto);
 
             mvc.perform(patch("/bookings/{id}?approved={approved}", bookingResponseDto.getId(), false)
-                            .header(UserController.headerUserId, user2.getId()))
+                            .header(Constants.headerUserId, user2.getId()))
                     .andExpect(status().isOk())
                     .andExpect(content().json(mapper.writeValueAsString(bookingResponseDto)));
 
@@ -217,7 +215,7 @@ public class BookingControllerTest {
                     .thenReturn(bookingResponseDto1);
 
             mvc.perform(get("/bookings/{id}", bookingResponseDto1.getId())
-                            .header(UserController.headerUserId, user2.getId()))
+                            .header(Constants.headerUserId, user2.getId()))
                     .andExpect(status().isOk())
                     .andExpect(content().json(mapper.writeValueAsString(bookingResponseDto1)));
 
@@ -235,7 +233,7 @@ public class BookingControllerTest {
                     .thenReturn(List.of(bookingResponseDto1, bookingResponseDto2));
 
             mvc.perform(get("/bookings?state={state}&from={from}&size={size}", "ALL", from, size)
-                            .header(UserController.headerUserId, user2.getId()))
+                            .header(Constants.headerUserId, user2.getId()))
                     .andExpect(status().isOk())
                     .andExpect(content().json(mapper.writeValueAsString(List.of(bookingResponseDto1, bookingResponseDto2))));
 
@@ -251,7 +249,7 @@ public class BookingControllerTest {
                     .thenReturn(List.of(bookingResponseDto1, bookingResponseDto2));
 
             mvc.perform(get("/bookings?from={from}&size={size}", from, size)
-                            .header(UserController.headerUserId, user2.getId()))
+                            .header(Constants.headerUserId, user2.getId()))
                     .andExpect(status().isOk())
                     .andExpect(content().json(mapper.writeValueAsString(List.of(bookingResponseDto1, bookingResponseDto2))));
 
@@ -263,7 +261,7 @@ public class BookingControllerTest {
         @Test
         public void shouldThrowExceptionIfUnknownState() throws Exception {
             mvc.perform(get("/bookings?state={state}&from={from}&size={size}", "unknown", from, size)
-                            .header(UserController.headerUserId, user2.getId()))
+                            .header(Constants.headerUserId, user2.getId()))
                     .andExpect(status().isInternalServerError());
 
             verify(bookingService, never())
@@ -275,7 +273,7 @@ public class BookingControllerTest {
             from = -1;
 
             mvc.perform(get("/bookings?from={from}&size={size}", from, size)
-                            .header(UserController.headerUserId, user2.getId()))
+                            .header(Constants.headerUserId, user2.getId()))
                     .andExpect(status().isInternalServerError());
 
             verify(bookingService, never())
@@ -287,7 +285,7 @@ public class BookingControllerTest {
             size = 0;
 
             mvc.perform(get("/bookings?from={from}&size={size}", from, size)
-                            .header(UserController.headerUserId, user2.getId()))
+                            .header(Constants.headerUserId, user2.getId()))
                     .andExpect(status().isInternalServerError());
 
             verify(bookingService, never())
@@ -304,7 +302,7 @@ public class BookingControllerTest {
                     .thenReturn(List.of(bookingResponseDto1, bookingResponseDto2));
 
             mvc.perform(get("/bookings/owner?state={state}&from={from}&size={size}", "ALL", from, size)
-                            .header(UserController.headerUserId, user1.getId()))
+                            .header(Constants.headerUserId, user1.getId()))
                     .andExpect(status().isOk())
                     .andExpect(content().json(mapper.writeValueAsString(List.of(bookingResponseDto1, bookingResponseDto2))));
 
@@ -320,7 +318,7 @@ public class BookingControllerTest {
                     .thenReturn(List.of(bookingResponseDto1, bookingResponseDto2));
 
             mvc.perform(get("/bookings/owner?from={from}&size={size}", from, size)
-                            .header(UserController.headerUserId, user1.getId()))
+                            .header(Constants.headerUserId, user1.getId()))
                     .andExpect(status().isOk())
                     .andExpect(content().json(mapper.writeValueAsString(List.of(bookingResponseDto1, bookingResponseDto2))));
 
@@ -332,7 +330,7 @@ public class BookingControllerTest {
         @Test
         public void shouldThrowExceptionIfUnknownState() throws Exception {
             mvc.perform(get("/bookings/owner?state={state}&from={from}&size={size}", "unknown", from, size)
-                            .header(UserController.headerUserId, user1.getId()))
+                            .header(Constants.headerUserId, user1.getId()))
                     .andExpect(status().isInternalServerError());
 
             verify(bookingService, never())
@@ -344,7 +342,7 @@ public class BookingControllerTest {
             from = -1;
 
             mvc.perform(get("/bookings/owner?from={from}&size={size}", from, size)
-                            .header(UserController.headerUserId, user1.getId()))
+                            .header(Constants.headerUserId, user1.getId()))
                     .andExpect(status().isInternalServerError());
 
             verify(bookingService, never())
@@ -356,7 +354,7 @@ public class BookingControllerTest {
             size = 0;
 
             mvc.perform(get("/bookings/owner?from={from}&size={size}", from, size)
-                            .header(UserController.headerUserId, user1.getId()))
+                            .header(Constants.headerUserId, user1.getId()))
                     .andExpect(status().isInternalServerError());
 
             verify(bookingService, never())

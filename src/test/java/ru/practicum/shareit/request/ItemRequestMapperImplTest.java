@@ -7,7 +7,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.dto.ItemRequestAddDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestExtendedDto;
@@ -21,23 +20,12 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith(MockitoExtension.class)
 public class ItemRequestMapperImplTest {
-    @InjectMocks
-    private ItemRequestMapperImpl itemRequestMapper;
-
     private final LocalDateTime dateTime = LocalDateTime.of(2023, 1, 1, 10, 0, 0);
     private final User user = User.builder()
             .id(1L)
             .name("Test user 1")
             .email("tester1@yandex.ru")
             .build();
-    private final List<Item> items = List.of(Item.builder()
-            .id(1L)
-            .name("item name")
-            .description("item description")
-            .available(true)
-            .owner(user)
-            .requestId(1L)
-            .build());
     private final List<ItemDto> itemsDto = List.of(ItemDto.builder()
             .id(1L)
             .name("item name")
@@ -51,11 +39,12 @@ public class ItemRequestMapperImplTest {
             .description("itemRequest1 description")
             .requesterId(user)
             .created(dateTime)
-            .items(items)
             .build();
     private final ItemRequestAddDto itemRequestCreateDto = ItemRequestAddDto.builder()
             .description("item description")
             .build();
+    @InjectMocks
+    private ItemRequestMapperImpl itemRequestMapper;
 
     @Nested
     class ToItemRequest {
@@ -69,7 +58,6 @@ public class ItemRequestMapperImplTest {
             assertEquals(user.getName(), result.getRequesterId().getName());
             assertEquals(user.getEmail(), result.getRequesterId().getEmail());
             assertEquals(dateTime, result.getCreated());
-            assertNull(result.getItems());
         }
 
         @Test

@@ -32,7 +32,7 @@ public class Item {
     @Column(nullable = false)
     Boolean available;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "OWNER_ID", referencedColumnName = "ID", nullable = false)
     User owner;

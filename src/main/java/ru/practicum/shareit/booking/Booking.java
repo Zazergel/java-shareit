@@ -32,12 +32,12 @@ public class Booking {
     @Column(name = "END_DATE", nullable = false)
     LocalDateTime end;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ITEM_ID", referencedColumnName = "ID", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     Item item;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "BOOKER_ID", referencedColumnName = "ID", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     User booker;

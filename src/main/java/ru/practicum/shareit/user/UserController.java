@@ -14,7 +14,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-    public static final String headerUserId = "X-Sharer-User-Id";
 
     @GetMapping
     public List<UserDto> getAll() {

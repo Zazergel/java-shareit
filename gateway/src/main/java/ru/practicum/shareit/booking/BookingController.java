@@ -52,6 +52,9 @@ public class BookingController {
         if (bookingRequestDto.getEnd().isBefore(bookingRequestDto.getStart())) {
             throw new BookingException("Недопустимое время брони.");
         }
+        if (bookingRequestDto.getEnd().isEqual(bookingRequestDto.getStart())) {
+            throw new BookingException("Недопустимое время брони.");
+        }
         return bookingClient.add(userId, bookingRequestDto);
     }
 

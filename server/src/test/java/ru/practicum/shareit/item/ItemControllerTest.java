@@ -114,7 +114,6 @@ public class ItemControllerTest {
     private final CommentRequestDto commentRequestDto = CommentRequestDto.builder()
             .text("comment 1")
             .build();
-    private final String text = "text for search";
     private ItemDto itemDto;
     private int from;
     private int size;
@@ -136,7 +135,7 @@ public class ItemControllerTest {
     @Nested
     class Add {
         @Test
-        public void shouldAdd() throws Exception {
+        void shouldAdd() throws Exception {
             when(itemService.add(ArgumentMatchers.eq(userDto1.getId()), ArgumentMatchers.any(ItemDto.class)))
                     .thenReturn(itemDto);
 
@@ -157,9 +156,9 @@ public class ItemControllerTest {
     @Nested
     class GetByOwner {
         @Test
-        public void shouldGet() throws Exception {
-            when(itemService.getByOwnerId(ArgumentMatchers.eq(userDto1.getId()),
-                    ArgumentMatchers.eq(PageRequest.of(from / size, size))))
+        void shouldGet() throws Exception {
+            when(itemService.getByOwnerId((userDto1.getId()),
+                    (PageRequest.of(from / size, size))))
                     .thenReturn(List.of(itemExtendedDto1, itemExtendedDto2));
 
             mvc.perform(get("/items?from={from}&size={size}", from, size)
@@ -167,16 +166,16 @@ public class ItemControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(content().json(mapper.writeValueAsString(List.of(itemExtendedDto1, itemExtendedDto2))));
 
-            verify(itemService, times(1)).getByOwnerId(ArgumentMatchers.eq(userDto1.getId()),
-                    ArgumentMatchers.eq(PageRequest.of(from / size, size)));
+            verify(itemService, times(1)).getByOwnerId((userDto1.getId()),
+                    (PageRequest.of(from / size, size)));
         }
     }
 
     @Nested
     class GetById {
         @Test
-        public void shouldGet() throws Exception {
-            when(itemService.getById(ArgumentMatchers.eq(userDto1.getId()), ArgumentMatchers.eq(itemDto1.getId())))
+        void shouldGet() throws Exception {
+            when(itemService.getById((userDto1.getId()), (itemDto1.getId())))
                     .thenReturn(itemExtendedDto1);
 
             mvc.perform(get("/items/{id}", itemDto1.getId())
@@ -184,15 +183,15 @@ public class ItemControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(content().json(mapper.writeValueAsString(itemExtendedDto1)));
 
-            verify(itemService, times(1)).getById(ArgumentMatchers.eq(userDto1.getId()),
-                    ArgumentMatchers.eq(itemDto1.getId()));
+            verify(itemService, times(1)).getById((userDto1.getId()),
+                    (itemDto1.getId()));
         }
     }
 
     @Nested
     class Update {
         @Test
-        public void shouldUpdate() throws Exception {
+        void shouldUpdate() throws Exception {
             when(itemService.update(ArgumentMatchers.eq(userDto1.getId()), ArgumentMatchers.eq(itemDto1.getId()),
                     ArgumentMatchers.any(ItemDto.class)))
                     .thenReturn(itemDto1);
@@ -214,35 +213,36 @@ public class ItemControllerTest {
     @Nested
     class Delete {
         @Test
-        public void shouldDelete() throws Exception {
+        void shouldDelete() throws Exception {
             mvc.perform(delete("/items/{id}", itemDto1.getId()))
                     .andExpect(status().isOk());
 
-            verify(itemService, times(1)).delete(ArgumentMatchers.eq(itemDto1.getId()));
+            verify(itemService, times(1)).delete((itemDto1.getId()));
         }
     }
 
     @Nested
     class Search {
         @Test
-        public void shouldSearch() throws Exception {
-            when(itemService.search(ArgumentMatchers.eq(text),
-                    ArgumentMatchers.eq(PageRequest.of(from / size, size))))
+        void shouldSearch() throws Exception {
+            String text = "text for search";
+            when(itemService.search((text),
+                    (PageRequest.of(from / size, size))))
                     .thenReturn(List.of(itemDto1, itemDto2));
 
             mvc.perform(get("/items/search?text={text}&from={from}&size={size}", text, from, size))
                     .andExpect(status().isOk())
                     .andExpect(content().json(mapper.writeValueAsString(List.of(itemDto1, itemDto2))));
 
-            verify(itemService, times(1)).search(ArgumentMatchers.eq(text),
-                    ArgumentMatchers.eq(PageRequest.of(from / size, size)));
+            verify(itemService, times(1)).search((text),
+                    (PageRequest.of(from / size, size)));
         }
     }
 
     @Nested
     class AddComment {
         @Test
-        public void shouldAdd() throws Exception {
+        void shouldAdd() throws Exception {
             when(itemService.addComment(ArgumentMatchers.eq(userDto1.getId()), ArgumentMatchers.eq(itemDto1.getId()),
                     ArgumentMatchers.any(CommentRequestDto.class)))
                     .thenReturn(commentDto1);

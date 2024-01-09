@@ -5,6 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -50,7 +53,7 @@ public class UserControllerTest {
     @Nested
     class Add {
         @Test
-        public void shouldCreate() throws Exception {
+        void shouldCreate() throws Exception {
             when(userClient.add(ArgumentMatchers.any(UserDto.class))).thenReturn(new ResponseEntity<>(HttpStatus.OK));
 
             mvc.perform(post("/users")
@@ -63,51 +66,11 @@ public class UserControllerTest {
             verify(userClient, times(1)).add(ArgumentMatchers.any(UserDto.class));
         }
 
-        @Test
-        public void shouldThrowExceptionIfEmailIsNull() throws Exception {
-            userDto1.setEmail(null);
-
-            mvc.perform(post("/users")
-                            .content(mapper.writeValueAsString(userDto1))
-                            .characterEncoding(StandardCharsets.UTF_8)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isBadRequest());
-
-            verify(userClient, never()).add(ArgumentMatchers.any());
-        }
-
-        @Test
-        public void shouldThrowExceptionIfEmailIsEmpty() throws Exception {
-            userDto1.setEmail("");
-
-            mvc.perform(post("/users")
-                            .content(mapper.writeValueAsString(userDto1))
-                            .characterEncoding(StandardCharsets.UTF_8)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isBadRequest());
-
-            verify(userClient, never()).add(ArgumentMatchers.any());
-        }
-
-        @Test
-        public void shouldThrowExceptionIfEmailIsBlank() throws Exception {
-            userDto1.setEmail(" ");
-
-            mvc.perform(post("/users")
-                            .content(mapper.writeValueAsString(userDto1))
-                            .characterEncoding(StandardCharsets.UTF_8)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isBadRequest());
-
-            verify(userClient, never()).add(ArgumentMatchers.any());
-        }
-
-        @Test
-        public void shouldThrowExceptionIfIsNotEmail() throws Exception {
-            userDto1.setEmail("tester1yandex.ru");
+        @ParameterizedTest
+        @NullSource
+        @ValueSource(strings = { "", " ", "tester1yandex.ru"})
+        void shouldThrowExceptionIfEmailIsIncorrect(String email) throws Exception {
+            userDto1.setEmail(email);
 
             mvc.perform(post("/users")
                             .content(mapper.writeValueAsString(userDto1))
@@ -123,7 +86,7 @@ public class UserControllerTest {
     @Nested
     class GetAll {
         @Test
-        public void shouldGet() throws Exception {
+        void shouldGet() throws Exception {
             when(userClient.getAll()).thenReturn(new ResponseEntity<>(HttpStatus.OK));
 
             mvc.perform(get("/users"))
@@ -136,20 +99,20 @@ public class UserControllerTest {
     @Nested
     class GetById {
         @Test
-        public void shouldGet() throws Exception {
-            when(userClient.getById(ArgumentMatchers.eq(userDto1.getId()))).thenReturn(new ResponseEntity<>(HttpStatus.OK));
+        void shouldGet() throws Exception {
+            when(userClient.getById((userDto1.getId()))).thenReturn(new ResponseEntity<>(HttpStatus.OK));
 
             mvc.perform(get("/users/{id}", userDto1.getId()))
                     .andExpect(status().isOk());
 
-            verify(userClient, times(1)).getById(ArgumentMatchers.eq(userDto1.getId()));
+            verify(userClient, times(1)).getById((userDto1.getId()));
         }
     }
 
     @Nested
     class Update {
         @Test
-        public void shouldUpdate() throws Exception {
+        void shouldUpdate() throws Exception {
             when(userClient.update(ArgumentMatchers.eq(userDto1.getId()), ArgumentMatchers.any(UserDto.class)))
                     .thenReturn(new ResponseEntity<>(HttpStatus.OK));
 
@@ -165,7 +128,7 @@ public class UserControllerTest {
         }
 
         @Test
-        public void shouldThrowExceptionIfNotEmail() throws Exception {
+        void shouldThrowExceptionIfNotEmail() throws Exception {
             userDtoToUpdate.setEmail("UpdatedTester1yandex.ru");
 
             mvc.perform(patch("/users/{id}", userDto1.getId())
@@ -182,7 +145,7 @@ public class UserControllerTest {
     @Nested
     class Delete {
         @Test
-        public void shouldDelete() throws Exception {
+        void shouldDelete() throws Exception {
             mvc.perform(delete("/users/{id}", 99L))
                     .andExpect(status().isOk());
 

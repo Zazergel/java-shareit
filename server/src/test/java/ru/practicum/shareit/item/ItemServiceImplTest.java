@@ -151,7 +151,7 @@ public class ItemServiceImplTest {
     @Nested
     class GetByOwnerId {
         @Test
-        public void shouldGetTwoItems() {
+        void shouldGetTwoItems() {
             when(itemRepository.findByOwnerIdOrderByIdAsc(any(), any())).thenReturn(new PageImpl<>(List.of(item1, item3)));
             when(itemMapper.toItemExtendedDto(any(), any(), any(), any())).thenCallRealMethod();
 
@@ -162,7 +162,7 @@ public class ItemServiceImplTest {
         }
 
         @Test
-        public void shouldGetZeroItems() {
+        void shouldGetZeroItems() {
             when(itemRepository.findByOwnerIdOrderByIdAsc(any(), any())).thenReturn(new PageImpl<>(List.of()));
 
             itemService.getByOwnerId(user1.getId(), pageable);
@@ -175,7 +175,7 @@ public class ItemServiceImplTest {
     @Nested
     class GetItemById {
         @Test
-        public void shouldGet() {
+        void shouldGet() {
             when(itemRepository.findById(item2.getId())).thenReturn(Optional.of(item2));
 
             itemService.getItemById(item2.getId());
@@ -184,7 +184,7 @@ public class ItemServiceImplTest {
         }
 
         @Test
-        public void shouldThrowExceptionIfItemIdNotFound() {
+        void shouldThrowExceptionIfItemIdNotFound() {
             when(itemRepository.findById(item2.getId())).thenReturn(Optional.empty());
 
             NotFoundException exception = assertThrows(NotFoundException.class,
@@ -197,7 +197,7 @@ public class ItemServiceImplTest {
     @Nested
     class GetById {
         @Test
-        public void shouldGetByNotOwner() {
+        void shouldGetByNotOwner() {
             when(itemRepository.findById(item1.getId())).thenReturn(Optional.of(item1));
             when(itemMapper.toItemExtendedDto(any(), any(), any(), any())).thenCallRealMethod();
 
@@ -210,7 +210,7 @@ public class ItemServiceImplTest {
         }
 
         @Test
-        public void shouldGetByOwnerWithLastAndNextBookings() {
+        void shouldGetByOwnerWithLastAndNextBookings() {
             when(itemRepository.findById(item1.getId())).thenReturn(Optional.of(item1));
             when(itemMapper.toItemExtendedDto(any(), any(), any(), any())).thenCallRealMethod();
             when(bookingRepository.findByItemIdAndStartBeforeAndStatusEqualsOrderByStartDesc(any(), any(), any()))
@@ -243,7 +243,7 @@ public class ItemServiceImplTest {
         }
 
         @Test
-        public void shouldGetByOwnerWithEmptyLastAndNextBookings() {
+        void shouldGetByOwnerWithEmptyLastAndNextBookings() {
             when(itemRepository.findById(item1.getId())).thenReturn(Optional.of(item1));
             when(itemMapper.toItemExtendedDto(any(), any(), any(), any())).thenCallRealMethod();
             when(bookingRepository.findByItemIdAndStartBeforeAndStatusEqualsOrderByStartDesc(any(), any(), any()))
@@ -269,7 +269,7 @@ public class ItemServiceImplTest {
     @Nested
     class Add {
         @Test
-        public void shouldAdd() {
+        void shouldAdd() {
             when(userService.getUserById(user1.getId())).thenReturn(user1);
             when(itemMapper.toItemDto(any())).thenCallRealMethod();
             when(itemMapper.toItem(any(), any())).thenCallRealMethod();
@@ -286,7 +286,7 @@ public class ItemServiceImplTest {
     @Nested
     class Update {
         @Test
-        public void shouldUpdateByOwner() {
+        void shouldUpdateByOwner() {
             when(itemRepository.findById(item1.getId())).thenReturn(Optional.of(item1));
 
             itemService.update(user1.getId(), item1.getId(), item1DtoToUpdate);
@@ -303,7 +303,7 @@ public class ItemServiceImplTest {
         }
 
         @Test
-        public void shouldNotUpdateIfBlank() {
+        void shouldNotUpdateIfBlank() {
             when(itemRepository.findById(item1.getId())).thenReturn(Optional.of(item1));
 
             itemService.update(user1.getId(), item1.getId(), item1DtoToUpdateBlank);
@@ -320,7 +320,7 @@ public class ItemServiceImplTest {
         }
 
         @Test
-        public void shouldThrowExceptionIfUpdateByNotOwner() {
+        void shouldThrowExceptionIfUpdateByNotOwner() {
             when(itemRepository.findById(item1.getId())).thenReturn(Optional.of(item1));
 
             AuthorizationException exception = assertThrows(AuthorizationException.class,
@@ -334,14 +334,14 @@ public class ItemServiceImplTest {
     @Nested
     class Delete {
         @Test
-        public void shouldDeleteIfIdExists() {
+        void shouldDeleteIfIdExists() {
             itemService.delete(item1.getId());
 
             verify(itemRepository, times(1)).deleteById(item1.getId());
         }
 
         @Test
-        public void shouldDeleteIfIdNotExists() {
+        void shouldDeleteIfIdNotExists() {
             itemService.delete(99L);
 
             verify(itemRepository, times(1)).deleteById(99L);
@@ -351,7 +351,7 @@ public class ItemServiceImplTest {
     @Nested
     class Search {
         @Test
-        public void shouldGetEmptyListIfTextIsEmpty() {
+        void shouldGetEmptyListIfTextIsEmpty() {
             List<ItemDto> itemsFromService = itemService.search("", pageable);
 
             assertTrue(itemsFromService.isEmpty());
@@ -359,7 +359,7 @@ public class ItemServiceImplTest {
         }
 
         @Test
-        public void shouldGetEmptyListIfTextIsBlank() {
+        void shouldGetEmptyListIfTextIsBlank() {
             List<ItemDto> itemsFromService = itemService.search(" ", pageable);
 
             assertTrue(itemsFromService.isEmpty());
@@ -367,7 +367,7 @@ public class ItemServiceImplTest {
         }
 
         @Test
-        public void shouldGetIfTextNotBlank() {
+        void shouldGetIfTextNotBlank() {
             when(itemRepository.search("iTemS", pageable)).thenReturn(new PageImpl<>(List.of(item1, item2)));
 
             List<ItemDto> itemsFromService = itemService.search("iTemS", pageable);
@@ -380,7 +380,7 @@ public class ItemServiceImplTest {
     @Nested
     class AddComment {
         @Test
-        public void shouldAdd() {
+        void shouldAdd() {
             when(itemMapper.commentRequestDtoToComment(any(), any(), any(), any())).thenCallRealMethod();
             when(userService.getUserById(user2.getId())).thenReturn(user2);
             when(bookingRepository.findByItemIdAndBookerIdAndEndIsBeforeAndStatusEquals(any(), any(), any(), any()))
@@ -401,7 +401,7 @@ public class ItemServiceImplTest {
         }
 
         @Test
-        public void shouldThrowExceptionIfNotFinishedBooking() {
+        void shouldThrowExceptionIfNotFinishedBooking() {
             when(itemMapper.commentRequestDtoToComment(any(), any(), any(), any())).thenCallRealMethod();
             when(userService.getUserById(user2.getId())).thenReturn(user2);
             when(bookingRepository.findByItemIdAndBookerIdAndEndIsBeforeAndStatusEquals(any(), any(), any(), any()))

@@ -74,7 +74,7 @@ public class ItemServiceImpl implements ItemService {
             if (bookingsByItem.get(item) != null) {
                 bookingDtosByItem.put(item.getId(), bookingsByItem.get(item)
                         .stream()
-                        .filter(Booking -> Booking.getStatus().equals(Status.APPROVED))
+                        .filter(booking -> booking.getStatus().equals(Status.APPROVED))
                         .map(itemMapper::bookingToBookingItemDto)
                         .sorted(Comparator.comparing(BookingItemDto::getStart))
                         .collect(Collectors.toList()));
@@ -107,9 +107,9 @@ public class ItemServiceImpl implements ItemService {
                 .map(item -> itemMapper.toItemExtendedDto(item, null, null, null))
                 .collect(Collectors.toList());
 
-        itemExtendedDtos.forEach(ItemDto -> ItemDto.setComments(commentDtosByItem.get(ItemDto.getId())));
-        itemExtendedDtos.forEach(ItemDto -> ItemDto.setNextBooking(nextBookingByItem.get(ItemDto.getId())));
-        itemExtendedDtos.forEach(ItemDto -> ItemDto.setLastBooking(lastBookingByItem.get(ItemDto.getId())));
+        itemExtendedDtos.forEach(itemDto -> itemDto.setComments(commentDtosByItem.get(itemDto.getId())));
+        itemExtendedDtos.forEach(itemDto -> itemDto.setNextBooking(nextBookingByItem.get(itemDto.getId())));
+        itemExtendedDtos.forEach(itemDto -> itemDto.setLastBooking(lastBookingByItem.get(itemDto.getId())));
         return itemExtendedDtos;
     }
 

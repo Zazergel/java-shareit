@@ -92,7 +92,7 @@ public class ItemMapperImplTest {
     @Nested
     class ToItemDto {
         @Test
-        public void shouldReturnItemDto() {
+        void shouldReturnItemDto() {
             ItemDto result = itemMapper.toItemDto(item);
 
             assertEquals(item.getId(), result.getId());
@@ -104,7 +104,7 @@ public class ItemMapperImplTest {
         }
 
         @Test
-        public void shouldReturnNull() {
+        void shouldReturnNull() {
             ItemDto result = itemMapper.toItemDto(null);
 
             assertNull(result);
@@ -114,7 +114,7 @@ public class ItemMapperImplTest {
     @Nested
     class ToItem {
         @Test
-        public void shouldReturnItemDto() {
+        void shouldReturnItemDto() {
             Item result = itemMapper.toItem(itemDto, user);
 
             assertEquals(itemDto.getId(), result.getId());
@@ -129,7 +129,7 @@ public class ItemMapperImplTest {
         }
 
         @Test
-        public void shouldReturnNull() {
+        void shouldReturnNull() {
             Item result = itemMapper.toItem(null, null);
 
             assertNull(result);
@@ -139,7 +139,7 @@ public class ItemMapperImplTest {
     @Nested
     class ToItemExtendedDto {
         @Test
-        public void shouldReturnItemExtendedDto() {
+        void shouldReturnItemExtendedDto() {
             ItemExtendedDto result = itemMapper.toItemExtendedDto(item, lastBooking, nextBooking, List.of(itemMapper.commentToCommentDto(comment1), itemMapper.commentToCommentDto(comment2)));
 
             assertEquals(item.getId(), result.getId());
@@ -174,7 +174,7 @@ public class ItemMapperImplTest {
         }
 
         @Test
-        public void shouldReturnNull() {
+        void shouldReturnNull() {
             ItemExtendedDto result = itemMapper.toItemExtendedDto(null, null, null, null);
             assertNull(result);
         }
@@ -183,7 +183,7 @@ public class ItemMapperImplTest {
     @Nested
     class BookingToBookingItemDto {
         @Test
-        public void shouldReturnBookingItemDto() {
+        void shouldReturnBookingItemDto() {
             BookingItemDto result = itemMapper.bookingToBookingItemDto(booking);
 
             assertEquals(booking.getId(), result.getId());
@@ -193,7 +193,7 @@ public class ItemMapperImplTest {
         }
 
         @Test
-        public void shouldReturnNull() {
+        void shouldReturnNull() {
             BookingItemDto result = itemMapper.bookingToBookingItemDto(null);
 
             assertNull(result);
@@ -203,7 +203,7 @@ public class ItemMapperImplTest {
     @Nested
     class CommentRequestDtoToComment {
         @Test
-        public void shouldReturnComment() {
+        void shouldReturnComment() {
             Comment result = itemMapper.commentRequestDtoToComment(commentRequestDto, dateTime.plusHours(4),
                     user, item.getId());
 
@@ -217,7 +217,7 @@ public class ItemMapperImplTest {
         }
 
         @Test
-        public void shouldReturnNull() {
+        void shouldReturnNull() {
             Comment result = itemMapper.commentRequestDtoToComment(null, null,
                     null, null);
 
@@ -228,7 +228,7 @@ public class ItemMapperImplTest {
     @Nested
     class CommentToCommentDto {
         @Test
-        public void shouldReturnCommentDto() {
+        void shouldReturnCommentDto() {
             CommentDto result = itemMapper.commentToCommentDto(comment1);
 
             assertEquals(comment1.getId(), result.getId());
@@ -238,7 +238,7 @@ public class ItemMapperImplTest {
         }
 
         @Test
-        public void shouldReturnNull() {
+        void shouldReturnNull() {
             CommentDto result = itemMapper.commentToCommentDto(null);
 
             assertNull(result);

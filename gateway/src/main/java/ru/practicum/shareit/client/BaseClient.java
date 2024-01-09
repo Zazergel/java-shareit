@@ -1,17 +1,13 @@
 package ru.practicum.shareit.client;
 
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.lang.Nullable;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import ru.practicum.shareit.markers.Constants;
+
+import java.util.List;
+import java.util.Map;
 
 public class BaseClient {
     protected final RestTemplate rest;
@@ -56,7 +52,7 @@ public class BaseClient {
         return patch(path, null, null, body);
     }
 
-    protected <T> ResponseEntity<Object> patch(String path, long userId) {
+    protected ResponseEntity<Object> patch(String path, long userId) {
         return patch(path, userId, null, null);
     }
 

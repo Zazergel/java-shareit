@@ -72,7 +72,7 @@ public class ItemFullContextTest {
     @Nested
     class Add {
         @Test
-        public void shouldAdd() {
+        void shouldAdd() {
             UserDto userDto = UserDto.builder()
                     .id(1L)
                     .name("Test user")
@@ -95,7 +95,7 @@ public class ItemFullContextTest {
                     Integer.parseInt(Constants.PAGE_DEFAULT_FROM),
                     Integer.parseInt(Constants.PAGE_DEFAULT_SIZE));
 
-            assertEquals(itemsFromController.size(), 1);
+            assertEquals(1, itemsFromController.size());
 
             ItemExtendedDto itemFromController = itemsFromController.get(0);
 
@@ -103,7 +103,7 @@ public class ItemFullContextTest {
         }
 
         @Test
-        public void shouldThrowExceptionIfItemOwnerIdNotFound() {
+        void shouldThrowExceptionIfItemOwnerIdNotFound() {
             ItemDto itemDto = ItemDto.builder()
                     .id(1L)
                     .name("Test item")
@@ -120,7 +120,7 @@ public class ItemFullContextTest {
     @Nested
     class GetByOwner {
         @Test
-        public void shouldGet() {
+        void shouldGet() {
             UserDto userDto1 = UserDto.builder()
                     .id(1L)
                     .name("Test user 1")
@@ -170,7 +170,7 @@ public class ItemFullContextTest {
                     Integer.parseInt(Constants.PAGE_DEFAULT_FROM),
                     Integer.parseInt(Constants.PAGE_DEFAULT_SIZE));
 
-            assertEquals(itemsFromController1.size(), 2);
+            assertEquals(2, itemsFromController1.size());
 
             ItemExtendedDto itemFromController1 = itemsFromController1.get(0);
             ItemExtendedDto itemFromController3 = itemsFromController1.get(1);
@@ -183,7 +183,7 @@ public class ItemFullContextTest {
                     Integer.parseInt(Constants.PAGE_DEFAULT_FROM),
                     Integer.parseInt(Constants.PAGE_DEFAULT_SIZE));
 
-            assertEquals(itemsFromController2.size(), 1);
+            assertEquals(1, itemsFromController2.size());
 
             ItemExtendedDto itemFromController2 = itemsFromController2.get(0);
 
@@ -191,7 +191,7 @@ public class ItemFullContextTest {
         }
 
         @Test
-        public void shouldGetIfEmpty() {
+        void shouldGetIfEmpty() {
             UserDto userDto = UserDto.builder()
                     .id(1L)
                     .name("Test user")
@@ -208,7 +208,7 @@ public class ItemFullContextTest {
         }
 
         @Test
-        public void shouldHaveBookingDateAndComments() {
+        void shouldHaveBookingDateAndComments() {
             UserDto userDto1 = UserDto.builder()
                     .id(1L)
                     .name("Test user 1")
@@ -267,7 +267,7 @@ public class ItemFullContextTest {
                     Integer.parseInt(Constants.PAGE_DEFAULT_FROM),
                     Integer.parseInt(Constants.PAGE_DEFAULT_SIZE));
 
-            assertEquals(itemsFromController.size(), 2);
+            assertEquals(2, itemsFromController.size());
 
             ItemExtendedDto itemFromController1 = itemsFromController.get(0);
             ItemExtendedDto itemFromController2 = itemsFromController.get(1);
@@ -277,7 +277,7 @@ public class ItemFullContextTest {
 
             List<CommentDto> commentsItem1 = itemFromController1.getComments();
 
-            assertEquals(commentsItem1.size(), 1);
+            assertEquals(1, commentsItem1.size());
             CommentDto commentDto = commentsItem1.get(0);
 
             assertEquals(commentDto.getText(), commentRequestDto.getText());
@@ -296,7 +296,7 @@ public class ItemFullContextTest {
     @Nested
     class GetById {
         @Test
-        public void shouldGet() {
+        void shouldGet() {
             UserDto userDto = UserDto.builder()
                     .id(1L)
                     .name("Test user")
@@ -320,7 +320,7 @@ public class ItemFullContextTest {
         }
 
         @Test
-        public void shouldThrowExceptionIfItemIdNotFound() {
+        void shouldThrowExceptionIfItemIdNotFound() {
             UserDto userDto = UserDto.builder()
                     .id(1L)
                     .name("Test user")
@@ -333,7 +333,7 @@ public class ItemFullContextTest {
         }
 
         @Test
-        public void shouldRequestByOwnerHaveBookingDateAndComments() {
+        void shouldRequestByOwnerHaveBookingDateAndComments() {
             UserDto userDto1 = UserDto.builder()
                     .id(1L)
                     .name("Test user 1")
@@ -394,7 +394,7 @@ public class ItemFullContextTest {
 
             List<CommentDto> commentsItem1 = itemFromController1.getComments();
 
-            assertEquals(commentsItem1.size(), 1);
+            assertEquals(1, commentsItem1.size());
             CommentDto comment = commentsItem1.get(0);
 
             assertEquals(comment.getText(), commentRequestDto.getText());
@@ -412,7 +412,7 @@ public class ItemFullContextTest {
         }
 
         @Test
-        public void shouldRequestByNoOwnerHaveNotBookingDateAndHaveComments() {
+        void shouldRequestByNoOwnerHaveNotBookingDateAndHaveComments() {
             UserDto userDto1 = UserDto.builder()
                     .id(1L)
                     .name("Test user 1")
@@ -474,7 +474,7 @@ public class ItemFullContextTest {
 
             List<CommentDto> commentsItem1 = itemFromController1.getComments();
 
-            assertEquals(commentsItem1.size(), 1);
+            assertEquals(1, commentsItem1.size());
             CommentDto comment = commentsItem1.get(0);
 
             assertEquals(comment.getText(), commentRequestDto.getText());
@@ -495,7 +495,7 @@ public class ItemFullContextTest {
     @Nested
     class Update {
         @Test
-        public void shouldUpdate() {
+        void shouldUpdate() {
             UserDto userDto = UserDto.builder()
                     .id(1L)
                     .name("Test user")
@@ -534,7 +534,7 @@ public class ItemFullContextTest {
         }
 
         @Test
-        public void shouldThrowExceptionIfItemOwnerIdForbidden() {
+        void shouldThrowExceptionIfItemOwnerIdForbidden() {
             UserDto userDto1 = UserDto.builder()
                     .id(1L)
                     .name("Test user 1")
@@ -580,7 +580,7 @@ public class ItemFullContextTest {
     @Nested
     class Delete {
         @Test
-        public void shouldDelete() {
+        void shouldDelete() {
             UserDto userDto = UserDto.builder()
                     .id(1L)
                     .name("Test user")
@@ -607,7 +607,7 @@ public class ItemFullContextTest {
         }
 
         @Test
-        public void shouldDeleteIfItemIdNotFound() {
+        void shouldDeleteIfItemIdNotFound() {
             UserDto userDto = UserDto.builder()
                     .id(1L)
                     .name("Test user")
@@ -625,7 +625,7 @@ public class ItemFullContextTest {
     @Nested
     class Search {
         @Test
-        public void shouldSearch() {
+        void shouldSearch() {
             UserDto userDto1 = UserDto.builder()
                     .id(1L)
                     .name("Test user 1")
@@ -685,7 +685,7 @@ public class ItemFullContextTest {
                     Integer.parseInt(Constants.PAGE_DEFAULT_FROM),
                     Integer.parseInt(Constants.PAGE_DEFAULT_SIZE));
 
-            assertEquals(itemsFromController.size(), 2);
+            assertEquals(2, itemsFromController.size());
 
             ItemDto itemFromController1 = itemsFromController.get(0);
             ItemDto itemFromController2 = itemsFromController.get(1);
@@ -695,7 +695,7 @@ public class ItemFullContextTest {
         }
 
         @Test
-        public void shouldSearchIfEmpty() {
+        void shouldSearchIfEmpty() {
             UserDto userDto = UserDto.builder()
                     .id(1L)
                     .name("Test user")
@@ -725,7 +725,7 @@ public class ItemFullContextTest {
     @Nested
     class AddComment {
         @Test
-        public void shouldCreate() {
+        void shouldCreate() {
             UserDto userDto1 = UserDto.builder()
                     .id(1L)
                     .name("Test user 1")
@@ -765,7 +765,7 @@ public class ItemFullContextTest {
 
             List<CommentDto> comments = item.getComments();
 
-            assertEquals(comments.size(), 1);
+            assertEquals(1, comments.size());
             CommentDto comment = comments.get(0);
 
             assertEquals(comment.getText(), commentRequestDto.getText());
@@ -773,7 +773,7 @@ public class ItemFullContextTest {
         }
 
         @Test
-        public void shouldThrowExceptionIfNoBooking() {
+        void shouldThrowExceptionIfNoBooking() {
             UserDto userDto1 = UserDto.builder()
                     .id(1L)
                     .name("Test user 1")
@@ -806,7 +806,7 @@ public class ItemFullContextTest {
         }
 
         @Test
-        public void shouldThrowExceptionIfBookingNotFinished() {
+        void shouldThrowExceptionIfBookingNotFinished() {
             UserDto userDto1 = UserDto.builder()
                     .id(1L)
                     .name("Test user 1")
@@ -847,7 +847,7 @@ public class ItemFullContextTest {
         }
 
         @Test
-        public void shouldThrowExceptionIfBookingNotApproved() {
+        void shouldThrowExceptionIfBookingNotApproved() {
             UserDto userDto1 = UserDto.builder()
                     .id(1L)
                     .name("Test user 1")

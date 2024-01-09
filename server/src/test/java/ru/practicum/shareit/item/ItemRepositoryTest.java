@@ -85,7 +85,7 @@ public class ItemRepositoryTest {
     @Nested
     class FindByOwnerIdOrderByIdAsc {
         @Test
-        public void shouldGetTwoItems() {
+        void shouldGetTwoItems() {
             List<Item> itemsFromRepository = itemRepository.findByOwnerIdOrderByIdAsc(user1.getId(), pageable)
                     .get()
                     .collect(Collectors.toList());
@@ -100,7 +100,7 @@ public class ItemRepositoryTest {
         }
 
         @Test
-        public void shouldGetOneItems() {
+        void shouldGetOneItems() {
             List<Item> itemsFromRepository = itemRepository.findByOwnerIdOrderByIdAsc(user2.getId(), pageable)
                     .get()
                     .collect(Collectors.toList());
@@ -113,7 +113,7 @@ public class ItemRepositoryTest {
         }
 
         @Test
-        public void shouldGetZeroItems() {
+        void shouldGetZeroItems() {
             List<Item> itemsFromRepository = itemRepository.findByOwnerIdOrderByIdAsc(99L, pageable)
                     .get()
                     .collect(Collectors.toList());
@@ -125,7 +125,7 @@ public class ItemRepositoryTest {
     @Nested
     class Search {
         @Test
-        public void shouldGetTwoAvailableItems() {
+        void shouldGetTwoAvailableItems() {
             List<Item> itemsFromRepository = itemRepository.search("search1", pageable)
                     .get()
                     .collect(Collectors.toList());
@@ -140,7 +140,7 @@ public class ItemRepositoryTest {
         }
 
         @Test
-        public void shouldGetZeroItemsIfItemsNotAvailable() {
+        void shouldGetZeroItemsIfItemsNotAvailable() {
             List<Item> itemsFromRepository = itemRepository.search("item3", pageable)
                     .get()
                     .collect(Collectors.toList());
@@ -149,7 +149,7 @@ public class ItemRepositoryTest {
         }
 
         @Test
-        public void shouldGetZeroItemsIfTextNotFound() {
+        void shouldGetZeroItemsIfTextNotFound() {
             List<Item> itemsFromRepository = itemRepository.search("99", pageable)
                     .get()
                     .collect(Collectors.toList());

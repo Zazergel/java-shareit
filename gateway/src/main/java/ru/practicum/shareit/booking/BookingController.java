@@ -27,9 +27,9 @@ public class BookingController {
     @GetMapping
     public ResponseEntity<Object> getAllByBookerId(
             @RequestHeader(Constants.headerUserId) Long userId,
-            @RequestParam(defaultValue = "ALL", required = false) String state,
-            @RequestParam(defaultValue = Constants.PAGE_DEFAULT_FROM, required = false) @PositiveOrZero Integer from,
-            @RequestParam(defaultValue = Constants.PAGE_DEFAULT_SIZE, required = false) @Positive Integer size) {
+            @RequestParam(defaultValue = "ALL") String state,
+            @RequestParam(defaultValue = Constants.PAGE_DEFAULT_FROM) @PositiveOrZero Integer from,
+            @RequestParam(defaultValue = Constants.PAGE_DEFAULT_SIZE) @Positive Integer size) {
         State stateEnum = State.stringToState(state)
                 .orElseThrow(() -> new IllegalArgumentException("Unknown state: " + state));
         return bookingClient.getAllByBookerId(userId, stateEnum, from, size);
@@ -38,9 +38,9 @@ public class BookingController {
     @GetMapping("/owner")
     public ResponseEntity<Object> getAllByOwnerId(
             @RequestHeader(Constants.headerUserId) Long userId,
-            @RequestParam(defaultValue = "ALL", required = false) String state,
-            @RequestParam(defaultValue = Constants.PAGE_DEFAULT_FROM, required = false) @PositiveOrZero Integer from,
-            @RequestParam(defaultValue = Constants.PAGE_DEFAULT_SIZE, required = false) @Positive Integer size) {
+            @RequestParam(defaultValue = "ALL") String state,
+            @RequestParam(defaultValue = Constants.PAGE_DEFAULT_FROM) @PositiveOrZero Integer from,
+            @RequestParam(defaultValue = Constants.PAGE_DEFAULT_SIZE) @Positive Integer size) {
         State stateEnum = State.stringToState(state).orElseThrow(
                 () -> new IllegalArgumentException("Unknown state: " + state));
         return bookingClient.getAllByOwnerId(userId, stateEnum, from, size);

@@ -33,6 +33,8 @@
 Данный проект реализован на основе микросервисной архитектуры. Первоначально запрос от пользователя приходит на сервис **gateway**, который осуществляет валидацию запроса. Если валидация прошла успешно, то gateway пропускает запрос на основной сервис - **server**, который содержит основную логику и осуществляет взаимодействие с базой данных **Postgres**. 
 Каждое из приложений запускается как самостоятельное Java-приложение в собственном **Docker-контейнере**, а их общение происходит через REST. 
 
+Функционал приложения протестирован c помощью **unit тестов**, а также [Postman коллекции](https://github.com/Zazergel/java-shareit/tree/main/postman). 
+
 ## Endpoints
 
 <details>
@@ -80,7 +82,7 @@
 ## DB scheme
 
 <details>
-  <summary><b>Schema of data base</b></summary>
+  <summary><b>Schema of database</b></summary>
  <img src='https://i.postimg.cc/Tw31t9Ln/Share-It-1.png' border='0' alt='Share-It-1'/>
 </details>
 
